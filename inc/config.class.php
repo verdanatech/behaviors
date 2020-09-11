@@ -1,6 +1,6 @@
 <?php
 /**
- * @version $Id: config.class.php 325 2020-09-03 09:01:30Z yllen $
+ * @version $Id: config.class.php 324 2020-09-03 08:56:30Z yllen $
  -------------------------------------------------------------------------
 
  LICENSE
@@ -344,7 +344,6 @@ class PluginBehaviorsConfig extends CommonDBTM {
       echo "</td><td rowspan='7' colspan='2' class='center'>";
       echo "<textarea cols='60' rows='12' name='comment' >".$config->fields['comment']."</textarea>";
       echo "</td></tr>";
-
 
       echo "<tr class='tab_bg_1'>";
       echo "<td>".__('Group of technicians assigned is mandatory before ticket is solved/closed',

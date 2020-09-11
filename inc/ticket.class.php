@@ -1,6 +1,6 @@
 <?php
 /**
- * @version $Id: ticket.class.php 325 2020-09-03 09:01:30Z yllen $
+ * @version $Id: ticket.class.php 324 2020-09-03 08:56:30Z yllen $
  -------------------------------------------------------------------------
 
  LICENSE
@@ -246,14 +246,13 @@ class PluginBehaviorsTicket {
          $result = $DB->request($last);
          $data = $result->next();
 
-         $query = ['SELECT'    => 'glpi_suppliers.email AS email',
-                   'DISTINCT'  => true,
-                   'FIELDS'    => 'glpi_suppliers.name AS name',
-                   'FROM'      => $supplierlinktable,
-                   'LEFT JOIN' => ['glpi_suppliers'
-                                    => ['FKEY' => [$supplierlinktable => 'suppliers_id',
-                                                   'glpi_suppliers'   => 'id']]],
-                   'WHERE'     => [$supplierlinktable.'.'.$fkfield => $target->obj->getID()]];
+         $query = ['SELECT DISTINCT' => 'glpi_suppliers.email AS email',
+                   'FIELDS'          => 'glpi_suppliers.name AS name',
+                   'FROM'            => $supplierlinktable,
+                   'LEFT JOIN'       => ['glpi_suppliers'
+                                        => ['FKEY' => [$supplierlinktable => 'suppliers_id',
+                                                       'glpi_suppliers'   => 'id']]],
+                   'WHERE'           => [$supplierlinktable.'.'.$fkfield => $target->obj->getID()]];
 
          $object = new $target->obj->supplierlinkclass();
          if ($object->getFromDB($data['lastid'])) {
@@ -363,11 +362,10 @@ class PluginBehaviorsTicket {
             }
       }
       if ($config->getField('ticketsolved_updatetech')
-          && in_array($ticket->input['status'], array_merge(Ticket::getSolvedStatusArray(),
-                                                            Ticket::getClosedStatusArray()))
-          && isset($ticket->input['_users_id_assign'])
-                   && (($ticket->input['_users_id_assign'] == 0)
-                       || ($ticket->input['_users_id_assign'] != Session::getLoginUserID()))) {
+            && in_array($ticket->input['status'], array_merge(Ticket::getSolvedStatusArray(),
+                                                               Ticket::getClosedStatusArray()))
+            && isset($ticket->input['_users_id_assign']) && (($ticket->input['_users_id_assign'] == 0)
+                  || ($ticket->input['_users_id_assign'] != Session::getLoginUserID()))) {
 
          $ticket->input['_users_id_assign'] = Session::getLoginUserID();
       }
@@ -523,9 +521,10 @@ class PluginBehaviorsTicket {
             }
          }
       }
+
       $cat = (isset($ticket->input['itilcategories_id'])
-                     ? $ticket->input['itilcategories_id']
-                     : $ticket->fields['itilcategories_id']);
+            ? $ticket->input['itilcategories_id']
+            : $ticket->fields['itilcategories_id']);
 
       if ($config->getField('is_ticketcategory_mandatory_on_assign')) {
          if (!$cat

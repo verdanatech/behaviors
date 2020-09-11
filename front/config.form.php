@@ -1,6 +1,6 @@
 <?php
 /**
- * @version $Id: config.form.php 325 2020-09-03 09:01:30Z yllen $
+ * @version $Id: config.form.php 310 2020-08-25 12:35:00Z yllen $
  -------------------------------------------------------------------------
 
  LICENSE

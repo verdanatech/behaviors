@@ -1,6 +1,6 @@
 <?php
 /**
- * @version $Id: setup.php 325 2020-09-03 09:01:30Z yllen $
+ * @version $Id: setup.php 324 2020-09-03 08:56:30Z yllen $
  -------------------------------------------------------------------------
 
  LICENSE
@@ -97,13 +97,24 @@ function plugin_init_behaviors() {
 function plugin_version_behaviors() {
 
    return ['name'           => __('Behaviours', 'behaviors'),
-           'version'        => '2.4.1',
+           'version'        => '2.3.2',
            'license'        => 'AGPLv3+',
            'author'         => 'Remi Collet, Nelly Mahu-Lasson',
            'homepage'       => 'https://forge.glpi-project.org/projects/behaviors',
-           'minGlpiVersion' => '9.5',
-           'requirements'   => ['glpi' => ['min' => '9.5',
-                                           'max' => '9.6']]];
+           'minGlpiVersion' => '9.4',
+           'requirements'   => ['glpi' => ['min' => '9.4',
+                                           'max' => '9.5']]];
+}
+
+// Optional : check prerequisites before install : may print errors or add to message after redirect
+function plugin_behaviors_check_prerequisites() {
+
+   // Strict version check (could be less strict, or could allow various version)
+   if (version_compare(GLPI_VERSION,'9.4','lt') || version_compare(GLPI_VERSION,'9.5','ge')) {
+      echo "This plugin requires GLPI >= 9.4";
+      return false;
+   }
+   return true;
 }
 
 
