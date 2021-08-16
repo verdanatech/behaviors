@@ -1,6 +1,6 @@
 <?php
 /**
- * @version $Id: common.class.php 310 2020-08-25 12:35:00Z yllen $
+ * @version $Id: common.class.php 332 2021-03-22 16:02:46Z yllen $
  -------------------------------------------------------------------------
 
  LICENSE
@@ -22,7 +22,7 @@
 
  @package   behaviors
  @author    Remi Collet, Nelly Mahu-Lasson
- @copyright Copyright (c) 2010-2020 Behaviors plugin team
+ @copyright Copyright (c) 2010-2021 Behaviors plugin team
  @license   AGPL License 3.0 or (at your option) any later version
             http://www.gnu.org/licenses/agpl-3.0-standalone.html
  @link      https://forge.glpi-project.org/projects/behaviors
@@ -32,7 +32,7 @@
  --------------------------------------------------------------------------
 */
 
-class PluginBehaviorsCommon {
+class PluginBehaviorsCommon extends CommonGLPI {
 
    static $clone_types = ['NotificationTemplate'  => 'PluginBehaviorsNotificationTemplate',
                           'Profile'               => 'PluginBehaviorsProfile',
@@ -85,7 +85,7 @@ class PluginBehaviorsCommon {
       if (array_key_exists($item->getType(), self::$clone_types)
           && $item->canUpdate()
           && $config->getField('clone')) {
-         return __('Clone', 'behaviors');
+         return __('Clone', 'behaviors'). " (Behaviors)";
       }
       return '';
    }

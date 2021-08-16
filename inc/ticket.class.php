@@ -1,6 +1,6 @@
 <?php
 /**
- * @version $Id: ticket.class.php 324 2020-09-03 08:56:30Z yllen $
+ * @version $Id: ticket.class.php 332 2021-03-22 16:02:46Z yllen $
  -------------------------------------------------------------------------
 
  LICENSE
@@ -22,7 +22,7 @@
 
  @package   behaviors
  @author    Remi Collet, Nelly Mahu-Lasson
- @copyright Copyright (c) 2010-2020 Behaviors plugin team
+ @copyright Copyright (c) 2010-2021 Behaviors plugin team
  @license   AGPL License 3.0 or (at your option) any later version
             http://www.gnu.org/licenses/agpl-3.0-standalone.html
  @link      https://forge.glpi-project.org/projects/behaviors
@@ -246,13 +246,14 @@ class PluginBehaviorsTicket {
          $result = $DB->request($last);
          $data = $result->next();
 
-         $query = ['SELECT DISTINCT' => 'glpi_suppliers.email AS email',
-                   'FIELDS'          => 'glpi_suppliers.name AS name',
-                   'FROM'            => $supplierlinktable,
-                   'LEFT JOIN'       => ['glpi_suppliers'
-                                        => ['FKEY' => [$supplierlinktable => 'suppliers_id',
-                                                       'glpi_suppliers'   => 'id']]],
-                   'WHERE'           => [$supplierlinktable.'.'.$fkfield => $target->obj->getID()]];
+         $query = ['SELECT'    => 'glpi_suppliers.email AS email',
+                   'DISTINCT'  => true,
+                   'FIELDS'    => 'glpi_suppliers.name AS name',
+                   'FROM'      => $supplierlinktable,
+                   'LEFT JOIN' => ['glpi_suppliers'
+                                    => ['FKEY' => [$supplierlinktable => 'suppliers_id',
+                                                   'glpi_suppliers'   => 'id']]],
+                   'WHERE'     => [$supplierlinktable.'.'.$fkfield => $target->obj->getID()]];
 
          $object = new $target->obj->supplierlinkclass();
          if ($object->getFromDB($data['lastid'])) {
@@ -362,10 +363,11 @@ class PluginBehaviorsTicket {
             }
       }
       if ($config->getField('ticketsolved_updatetech')
-            && in_array($ticket->input['status'], array_merge(Ticket::getSolvedStatusArray(),
-                                                               Ticket::getClosedStatusArray()))
-            && isset($ticket->input['_users_id_assign']) && (($ticket->input['_users_id_assign'] == 0)
-                  || ($ticket->input['_users_id_assign'] != Session::getLoginUserID()))) {
+          && in_array($ticket->input['status'], array_merge(Ticket::getSolvedStatusArray(),
+                                                            Ticket::getClosedStatusArray()))
+          && isset($ticket->input['_users_id_assign'])
+                   && (($ticket->input['_users_id_assign'] == 0)
+                       || ($ticket->input['_users_id_assign'] != Session::getLoginUserID()))) {
 
          $ticket->input['_users_id_assign'] = Session::getLoginUserID();
       }
@@ -521,10 +523,9 @@ class PluginBehaviorsTicket {
             }
          }
       }
-
       $cat = (isset($ticket->input['itilcategories_id'])
-            ? $ticket->input['itilcategories_id']
-            : $ticket->fields['itilcategories_id']);
+                     ? $ticket->input['itilcategories_id']
+                     : $ticket->fields['itilcategories_id']);
 
       if ($config->getField('is_ticketcategory_mandatory_on_assign')) {
          if (!$cat
@@ -650,7 +651,6 @@ class PluginBehaviorsTicket {
             }
          }
       }
-
       if ($config->getField('ticketsolved_updatetech')) {
          $ticket_user      = new Ticket_User();
          if (!$ticket_user->getFromDBByCrit(['tickets_id' => $ticket->fields['id'],

@@ -22,7 +22,7 @@
 
  @package   behaviors
  @author    Remi Collet, Nelly Mahu-Lasson
- @copyright Copyright (c) 2018-2020 Behaviors plugin team
+ @copyright Copyright (c) 2018-2021 Behaviors plugin team
  @license   AGPL License 3.0 or (at your option) any later version
             http://www.gnu.org/licenses/agpl-3.0-standalone.html
  @link      https://forge.glpi-project.org/projects/behaviors
@@ -89,7 +89,8 @@ class PluginBehaviorsITILSolution {
             return;
          }
          if ($config->getField('is_tickettech_mandatory')
-             && ($ticket->countUsers(CommonITILActor::ASSIGN) == 0)) {
+             && ($ticket->countUsers(CommonITILActor::ASSIGN) == 0)
+             && !$config->getField('ticketsolved_updatetech')) {
             $soluce->input = false;
             Session::addMessageAfterRedirect(__("Technician assigned is mandatory before ticket is solved/closed",
                                              'behaviors'), true, ERROR);
@@ -176,7 +177,7 @@ class PluginBehaviorsITILSolution {
    static function afterAdd(ITILSolution $soluce) {
 
       $ticket = new Ticket();
-      $config = new Config();
+      $config = PluginBehaviorsConfig::getInstance();
       if ($ticket->getFromDB($soluce->input['items_id'])
           && $soluce->input['itemtype'] == 'Ticket') {
 
