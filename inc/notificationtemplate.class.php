@@ -1,6 +1,6 @@
 <?php
 /**
- * @version $Id: notificationtemplate.class.php 338 2021-03-30 12:36:31Z yllen $
+ * @version $Id: notificationtemplate.class.php 332 2021-03-22 16:02:46Z yllen $
  -------------------------------------------------------------------------
 
  LICENSE
