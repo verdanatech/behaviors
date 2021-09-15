@@ -1,6 +1,6 @@
 <?php
 /**
- * @version $Id: config.class.php 332 2021-03-22 16:02:46Z yllen $
+ * @version $Id: config.class.php 338 2021-03-30 12:36:31Z yllen $
  -------------------------------------------------------------------------
 
  LICENSE
@@ -287,7 +287,7 @@ class PluginBehaviorsConfig extends CommonDBTM {
 
       echo "<tr class='tab_bg_1'>";
       echo "<td colspan='2' class='tab_bg_2 b center'>".__('Update of a ticket')."</td>";
-      echo "</td><td class='tab_bg_2 b'>".__('Allow Clone', 'behaviors')."</td><td>";
+      echo "</td><td class='tab_bg_2 b center'>".__('Allow Clone', 'behaviors')."</td><td>";
       Dropdown::showYesNo('clone', $config->fields['clone']);
       echo "</td></tr>";
 

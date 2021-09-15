@@ -1,6 +1,6 @@
 <?php
 /**
- * @version $Id: common.class.php 332 2021-03-22 16:02:46Z yllen $
+ * @version $Id: common.class.php 338 2021-03-30 12:36:31Z yllen $
  -------------------------------------------------------------------------
 
  LICENSE
@@ -85,7 +85,8 @@ class PluginBehaviorsCommon extends CommonGLPI {
       if (array_key_exists($item->getType(), self::$clone_types)
           && $item->canUpdate()
           && $config->getField('clone')) {
-         return __('Clone', 'behaviors'). " (Behaviors)";
+         return sprintf(__('%1$s (%2$s)'), __('Clone', 'behaviors'),
+                        __('Behaviours', 'behaviors'));
       }
       return '';
    }
