@@ -1,6 +1,5 @@
 <?php
 /**
- * @version $Id: setup.php 338 2021-03-30 12:36:31Z yllen $
  -------------------------------------------------------------------------
 
  LICENSE
@@ -22,7 +21,7 @@
 
  @package   behaviors
  @author    Remi Collet, Nelly Mahu-Lasson
- @copyright Copyright (c) 2010-2021 Behaviors plugin team
+ @copyright Copyright (c) 2010-2022 Behaviors plugin team
  @license   AGPL License 3.0 or (at your option) any later version
             http://www.gnu.org/licenses/agpl-3.0-standalone.html
  @link      https://forge.glpi-project.org/projects/behaviors
@@ -44,7 +43,7 @@ function plugin_init_behaviors() {
        'Group_Ticket'       => ['PluginBehaviorsGroup_Ticket',      'afterAdd'],
        'Supplier_Ticket'    => ['PluginBehaviorsSupplier_Ticket',   'afterAdd'],
        'Document_Item'      => ['PluginBehaviorsDocument_Item',     'afterAdd'],
-       'ITILSolution'       => ['PluginBehaviorsITILSolution',      'afterAdd']];
+       'ITILFollowup'       => ['PluginBehaviorsITILFollowup',      'alterAdd']];
 
    $PLUGIN_HOOKS['item_update']['behaviors'] =
       ['Ticket'             => ['PluginBehaviorsTicket',            'afterUpdate']];
@@ -53,7 +52,8 @@ function plugin_init_behaviors() {
       ['Ticket'             => ['PluginBehaviorsTicket',            'beforeAdd'],
        'ITILSolution'       => ['PluginBehaviorsITILSolution',      'beforeAdd'],
        'TicketTask'         => ['PluginBehaviorsTickettask',        'beforeAdd'],
-       'Change'             => ['PluginBehaviorsChange',            'beforeAdd']];
+       'Change'             => ['PluginBehaviorsChange',            'beforeAdd'],
+       'ITILFollowup'       => ['PluginBehaviorsITILFollowup',      'beforeAdd']];
 
    $PLUGIN_HOOKS['post_prepareadd']['behaviors'] =
       ['Ticket'             => ['PluginBehaviorsTicket',            'afterPrepareAdd']];
@@ -100,7 +100,7 @@ function plugin_init_behaviors() {
 function plugin_version_behaviors() {
 
    return ['name'           => __('Behaviours', 'behaviors'),
-           'version'        => '2.5.0',
+           'version'        => '2.6.0',
            'license'        => 'AGPLv3+',
            'author'         => 'Remi Collet, Nelly Mahu-Lasson',
            'homepage'       => 'https://forge.glpi-project.org/projects/behaviors',

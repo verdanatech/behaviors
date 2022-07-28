@@ -1,6 +1,6 @@
 <?php
 /**
- * @version $Id: ticket.class.php 338 2021-03-30 12:36:31Z yllen $
+ * @version $Id$
  -------------------------------------------------------------------------
 
  LICENSE
@@ -22,7 +22,7 @@
 
  @package   behaviors
  @author    Remi Collet, Nelly Mahu-Lasson
- @copyright Copyright (c) 2010-2021 Behaviors plugin team
+ @copyright Copyright (c) 2010-2022 Behaviors plugin team
  @license   AGPL License 3.0 or (at your option) any later version
             http://www.gnu.org/licenses/agpl-3.0-standalone.html
  @link      https://forge.glpi-project.org/projects/behaviors
@@ -299,7 +299,8 @@ class PluginBehaviorsTicket {
           && ($_SESSION['glpiactiveprofile']['interface'] == 'central')) {
 
          if ($config->getField('is_requester_mandatory')
-             && ((is_array($ticket->input['_users_id_requester'])
+             && !isset($ticket->input['_users_id_requester'])
+             || ((is_array($ticket->input['_users_id_requester'])
                   && empty($ticket->input['_users_id_requester']))
                  || (!is_array($ticket->input['_users_id_requester'])
                      && !$ticket->input['_users_id_requester']))
@@ -580,6 +581,27 @@ class PluginBehaviorsTicket {
                   false);
          }
       }
+
+      if ($config->getField('ticketsolved_updatetech')
+          && isset($ticket->input['status'])
+          && in_array($ticket->input['status'], array_merge(Ticket::getSolvedStatusArray(),
+                                                            Ticket::getClosedStatusArray()))) {
+
+         $ticket_user      = new Ticket_User();
+         if ((!$ticket_user->getFromDBByCrit(['tickets_id' => $ticket->fields['id'],
+                                              'type'       => CommonITILActor::ASSIGN])
+             || (isset($ticket_user->fields['users_id'])
+                       && ($ticket_user->fields['users_id'] != Session::getLoginUserID())))
+             && (((in_array($ticket->fields['status'], Ticket::getSolvedStatusArray()))
+                  && (in_array($ticket->input['status'], Ticket::getClosedStatusArray())))
+                  || !in_array($ticket->fields['status'], array_merge(Ticket::getSolvedStatusArray(),
+                                                                      Ticket::getClosedStatusArray())))) {
+
+            $ticket_user->add(['tickets_id' => $ticket->getID(),
+                  'users_id'   => Session::getLoginUserID(),
+                  'type'       => CommonITILActor::ASSIGN]);
+         }
+      }
    }
 
 
@@ -631,7 +653,7 @@ class PluginBehaviorsTicket {
 
 
    static function afterUpdate(Ticket $ticket) {
-
+      toolbox::logdebug("aftyer update ticket", $ticket);
       $config = PluginBehaviorsConfig::getInstance();
 
       if ($config->getField('add_notif')
@@ -652,23 +674,6 @@ class PluginBehaviorsTicket {
             } else {
                NotificationEvent::raiseEvent('plugin_behaviors_ticketstatus', $ticket);
             }
-         }
-      }
-      if ($config->getField('ticketsolved_updatetech')) {
-         $ticket_user      = new Ticket_User();
-         if (!$ticket_user->getFromDBByCrit(['tickets_id' => $ticket->fields['id'],
-                                             'type'       => CommonITILActor::ASSIGN])
-             || (isset($ticket_user->fields['users_id'])
-                 && ($ticket_user->fields['users_id'] != Session::getLoginUserID()))
-             && isset($ticket->oldvalues)
-             && !in_array($ticket->oldvalues['status'], array_merge(Ticket::getSolvedStatusArray(),
-                                                                    Ticket::getClosedStatusArray()))
-             && in_array($ticket->input['status'], array_merge(Ticket::getSolvedStatusArray(),
-                                                               Ticket::getClosedStatusArray()))) {
-
-            $ticket_user->add(['tickets_id' => $ticket->getID(),
-                               'users_id'   => Session::getLoginUserID(),
-                               'type'       => CommonITILActor::ASSIGN]);
          }
       }
    }

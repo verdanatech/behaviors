@@ -1,6 +1,5 @@
 <?php
 /**
- * @version $Id: config.class.php 338 2021-03-30 12:36:31Z yllen $
  -------------------------------------------------------------------------
 
  LICENSE
@@ -22,7 +21,7 @@
 
  @package   behaviors
  @author    Remi Collet, Nelly Mahu-Lasson
- @copyright Copyright (c) 2010-2021 Behaviors plugin team
+ @copyright Copyright (c) 2010-2022 Behaviors plugin team
  @license   AGPL License 3.0 or (at your option) any later version
             http://www.gnu.org/licenses/agpl-3.0-standalone.html
  @link      https://forge.glpi-project.org/projects/behaviors
@@ -107,7 +106,10 @@ class PluginBehaviorsConfig extends CommonDBTM {
                      `myasset` tinyint(1) NOT NULL default '0',
                      `groupasset` tinyint(1) NOT NULL default '0',
                      `clone` tinyint(1) NOT NULL default '0',
+                     `addfup_updatetech` tinyint(1) NOT NULL default '0',
                      `is_tickettasktodo` tinyint(1) NOT NULL default '0',
+                     `is_problemtasktodo` tinyint(1) NOT NULL default '0',
+                     `is_changetasktodo` tinyint(1) NOT NULL default '0',
                      `date_mod` datetime default NULL,
                      `comment` text,
                      PRIMARY KEY  (`id`)
@@ -208,6 +210,11 @@ class PluginBehaviorsConfig extends CommonDBTM {
                         ['after' => 'use_assign_user_group']);
          $mig->addField($table, 'is_ticketcategory_mandatory_on_assign', 'bool',
                         ['after' => 'is_ticketcategory_mandatory']);
+
+         // version 2.6.0
+         $mig->addField($table, 'is_changetasktodo', 'bool', ['after' => 'is_tickettasktodo']);
+         $mig->addField($table, 'is_problemtasktodo', 'bool', ['after' => 'is_tickettasktodo']);
+         $mig->addField($table, 'addfup_updatetech', 'bool', ['after' => 'clone']);
       }
 
    }
@@ -288,14 +295,19 @@ class PluginBehaviorsConfig extends CommonDBTM {
       echo "<tr class='tab_bg_1'>";
       echo "<td colspan='2' class='tab_bg_2 b center'>".__('Update of a ticket')."</td>";
       echo "</td><td class='tab_bg_2 b center'>".__('Allow Clone', 'behaviors')."</td><td>";
-      Dropdown::showYesNo('clone', $config->fields['clone']);
+
+      $tab = ['0' => __('No'),
+              '1' => __("In the active entity", "behaviors"),
+              '2' => __("In the item's entity", "behaviors")];
+      Dropdown::showFromArray("clone", $tab, ['value' => $config->fields['clone']]);
       echo "</td></tr>";
 
       echo "<tr class='tab_bg_1'>";
       echo "<td>".__('Duration is mandatory before ticket is solved/closed', 'behaviors')."</td><td>";
       Dropdown::showYesNo("is_ticketrealtime_mandatory",
                           $config->fields['is_ticketrealtime_mandatory']);
-      echo "<td colspan=2' class='tab_bg_2 b center'>".__('Update of a problem')."</td></tr>";
+      echo "</td><td colspan=2' class='tab_bg_2 b center'>".__('Update of a problem');
+      echo "</td></tr>";
 
       echo "<tr class='tab_bg_1'>";
       echo "<td>".__('Category is mandatory before ticket is solved/closed', 'behaviors')."</td><td>";
@@ -312,13 +324,25 @@ class PluginBehaviorsConfig extends CommonDBTM {
       echo "</td><td>";
       Dropdown::showYesNo("is_ticketsolutiontype_mandatory",
                           $config->fields['is_ticketsolutiontype_mandatory']);
-      echo "</td><td colspan=2' class='tab_bg_2 b center'>".__('New change')."</td></tr>";
+      echo "</td><td>".__('Block the solving/closing of a problem if task do to', 'behaviors');
+      echo "</td><td>";
+      Dropdown::showYesNo("is_problemtasktodo", $config->fields['is_problemtasktodo']);
+      echo "</td></tr>";
 
       echo "<tr class='tab_bg_1'>";
       echo "<td>".__('Category is mandatory when you assign a ticket', 'behaviors')."</td><td>";
       Dropdown::showYesNo("is_ticketcategory_mandatory_on_assign",
                           $config->fields['is_ticketcategory_mandatory_on_assign']);
-      echo "</td><td>".__("Change's number format", "behaviors")."</td><td width='20%'>";
+      echo "</td><td colspan=2' class='tab_bg_2 b center'>".__('New change');
+      echo "</td></tr>";
+
+      echo "<tr class='tab_bg_1'>";
+      echo "<td>".__('Description of solution is mandatory before ticket is solved/closed',
+                          'behaviors');
+      echo "</td><td>";
+      Dropdown::showYesNo("is_ticketsolution_mandatory",
+                          $config->fields['is_ticketsolution_mandatory']);
+      echo "</td> <td>".__("Change's number format", "behaviors")."</td><td width='20%'>";
       $tab = ['NULL' => Dropdown::EMPTY_VALUE];
       foreach (['Y000001', 'Ym0001', 'Ymd01', 'ymd0001'] as $fmt) {
          $tab[$fmt] = date($fmt) . '  (' . $fmt . ')';
@@ -328,23 +352,12 @@ class PluginBehaviorsConfig extends CommonDBTM {
       echo "</td></tr>";
 
       echo "<tr class='tab_bg_1'>";
-      echo "</td><td>".__('Description of solution is mandatory before ticket is solved/closed',
-                          'behaviors');
-      echo "</td><td>";
-      Dropdown::showYesNo("is_ticketsolution_mandatory",
-                          $config->fields['is_ticketsolution_mandatory']);
-      echo "</td><td colspan='2' class='tab_bg_2 b center'>".__('Comments');
-      echo "</td></tr>";
-
-      echo "<tr class='tab_bg_1'>";
       echo "<td>".__('Technician assigned is mandatory before ticket is solved/closed', 'behaviors');
       echo "</td><td>";
       Dropdown::showYesNo("is_tickettech_mandatory",
                           $config->fields['is_tickettech_mandatory']);
-      echo "</td><td rowspan='7' colspan='2' class='center'>";
-      echo "<textarea cols='60' rows='12' name='comment' >".$config->fields['comment']."</textarea>";
+      echo "</td><td colspan=2' class='tab_bg_2 b center'>".__('Update of a change');
       echo "</td></tr>";
-
 
       echo "<tr class='tab_bg_1'>";
       echo "<td>".__('Group of technicians assigned is mandatory before ticket is solved/closed',
@@ -352,19 +365,25 @@ class PluginBehaviorsConfig extends CommonDBTM {
       echo "</td><td>";
       Dropdown::showYesNo("is_tickettechgroup_mandatory",
                           $config->fields['is_tickettechgroup_mandatory']);
+      echo "</td><td>".__('Block the solving/closing of a change if task do to', 'behaviors');
+      echo "</td><td>";
+      Dropdown::showYesNo("is_changetasktodo", $config->fields['is_changetasktodo']);
       echo "</td></tr>";
 
       echo "<tr class='tab_bg_1'>";
       echo "<td>".__("Use the technician's group", "behaviors")."</td><td>";
       Dropdown::showFromArray('use_assign_user_group_update', $yesnoall,
                               ['value' => $config->fields['use_assign_user_group_update']]);
+      echo "</td><td colspan='2' class='tab_bg_2 b center'>".__('Comments');
       echo "</td></tr>\n";
 
       echo "<tr class='tab_bg_1'>";
       echo "<td>".__('Location is mandatory before ticket is solved/closed', 'behaviors');
       echo "</td><td>";
       Dropdown::showYesNo("is_ticketlocation_mandatory",
-      $config->fields['is_ticketlocation_mandatory']);
+                           $config->fields['is_ticketlocation_mandatory']);
+      echo "<td rowspan='7' colspan='2' class='center'>";
+      echo "<textarea cols='60' rows='12' name='comment' >".$config->fields['comment']."</textarea>";
       echo "</td></tr>";
 
       echo "<tr class='tab_bg_1'>";
@@ -398,10 +417,21 @@ class PluginBehaviorsConfig extends CommonDBTM {
       Dropdown::showYesNo("is_tickettasktodo", $config->fields['is_tickettasktodo']);
       echo "</td><td colspan='2'></td></tr>";
 
+
+
+      echo "<tr class='tab_bg_1'>";
+      echo "<td colspan='2'></td></tr>";
+
       echo "<tr class='tab_bg_1'>";
       echo "<td>". __('Add the logged technician when solve ticket', 'behaviors');
       echo "</td><td>";
       Dropdown::showYesNo("ticketsolved_updatetech", $config->fields['ticketsolved_updatetech']);
+      echo "</td><td colspan='2'></td></tr>";
+
+      echo "<tr class='tab_bg_1'>";
+      echo "<td>". __('Technician assignment when adding follow up', 'behaviors');
+      echo "</td><td>";
+      Dropdown::showYesNo("addfup_updatetech", $config->fields['addfup_updatetech']);
       echo "</td><td colspan='2'></td></tr>";
 
       echo "<tr class='tab_bg_1'>";
