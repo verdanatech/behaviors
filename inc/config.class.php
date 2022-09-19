@@ -77,43 +77,47 @@ class PluginBehaviorsConfig extends CommonDBTM {
 
       $table = 'glpi_plugin_behaviors_configs';
       if (!$DB->tableExists($table)) { //not installed
+         $default_charset   = DBConnection::getDefaultCharset();
+         $default_collation = DBConnection::getDefaultCollation();
+         $default_key_sign  = DBConnection::getDefaultPrimaryKeySignOption();
 
          $query = "CREATE TABLE `". $table."`(
-                     `id` int(11) NOT NULL,
-                     `use_requester_item_group` tinyint(1) NOT NULL default '0',
-                     `use_requester_user_group` tinyint(1) NOT NULL default '0',
-                     `is_ticketsolutiontype_mandatory` tinyint(1) NOT NULL default '0',
-                     `is_ticketsolution_mandatory` tinyint(1) NOT NULL default '0',
-                     `is_ticketcategory_mandatory` tinyint(1) NOT NULL default '0',
-                     `is_ticketcategory_mandatory_on_assign` tinyint(1) NOT NULL default '0',
-                     `is_tickettaskcategory_mandatory` tinyint(1) NOT NULL default '0',
-                     `is_tickettech_mandatory` tinyint(1) NOT NULL default '0',
-                     `is_tickettechgroup_mandatory` tinyint(1) NOT NULL default '0',
-                     `is_ticketrealtime_mandatory` tinyint(1) NOT NULL default '0',
-                     `is_ticketlocation_mandatory` tinyint(1) NOT NULL default '0',
-                     `is_requester_mandatory` tinyint(1) NOT NULL default '0',
-                     `is_ticketdate_locked` tinyint(1) NOT NULL default '0',
-                     `use_assign_user_group` tinyint(1) NOT NULL default '0',
-                     `use_assign_user_group_update` tinyint(1) NOT NULL default '0',
-                     `ticketsolved_updatetech` tinyint(1) NOT NULL default '0',
+                     `id` int $default_key_sign NOT NULL,
+                     `use_requester_item_group` tinyint NOT NULL default '0',
+                     `use_requester_user_group` tinyint NOT NULL default '0',
+                     `is_ticketsolutiontype_mandatory` tinyint NOT NULL default '0',
+                     `is_ticketsolution_mandatory` tinyint NOT NULL default '0',
+                     `is_ticketcategory_mandatory` tinyint NOT NULL default '0',
+                     `is_ticketcategory_mandatory_on_assign` tinyint NOT NULL default '0',
+                     `is_tickettaskcategory_mandatory` tinyint NOT NULL default '0',
+                     `is_tickettech_mandatory` tinyint NOT NULL default '0',
+                     `is_tickettechgroup_mandatory` tinyint NOT NULL default '0',
+                     `is_ticketrealtime_mandatory` tinyint NOT NULL default '0',
+                     `is_ticketlocation_mandatory` tinyint NOT NULL default '0',
+                     `is_requester_mandatory` tinyint NOT NULL default '0',
+                     `is_ticketdate_locked` tinyint NOT NULL default '0',
+                     `use_assign_user_group` tinyint NOT NULL default '0',
+                     `use_assign_user_group_update` tinyint NOT NULL default '0',
+                     `ticketsolved_updatetech` tinyint NOT NULL default '0',
                      `tickets_id_format` VARCHAR(15) NULL,
                      `changes_id_format` VARCHAR(15) NULL,
-                     `is_problemsolutiontype_mandatory` tinyint(1) NOT NULL default '0',
-                     `remove_from_ocs` tinyint(1) NOT NULL default '0',
-                     `add_notif` tinyint(1) NOT NULL default '0',
-                     `use_lock` tinyint(1) NOT NULL default '0',
-                     `single_tech_mode` int(11) NOT NULL default '0',
-                     `myasset` tinyint(1) NOT NULL default '0',
-                     `groupasset` tinyint(1) NOT NULL default '0',
-                     `clone` tinyint(1) NOT NULL default '0',
-                     `addfup_updatetech` tinyint(1) NOT NULL default '0',
-                     `is_tickettasktodo` tinyint(1) NOT NULL default '0',
-                     `is_problemtasktodo` tinyint(1) NOT NULL default '0',
-                     `is_changetasktodo` tinyint(1) NOT NULL default '0',
-                     `date_mod` datetime default NULL,
+                     `is_problemsolutiontype_mandatory` tinyint NOT NULL default '0',
+                     `remove_from_ocs` tinyint NOT NULL default '0',
+                     `add_notif` tinyint NOT NULL default '0',
+                     `use_lock` tinyint NOT NULL default '0',
+                     `single_tech_mode` int $default_key_sign NOT NULL default '0',
+                     `myasset` tinyint NOT NULL default '0',
+                     `groupasset` tinyint NOT NULL default '0',
+                     `clone` tinyint NOT NULL default '0',
+                     `addfup_updatetech` tinyint NOT NULL default '0',
+                     `is_tickettasktodo` tinyint NOT NULL default '0',
+                     `is_problemtasktodo` tinyint NOT NULL default '0',
+                     `is_changetasktodo` tinyint NOT NULL default '0',
+                     `date_mod` timestamp NULL DEFAULT NULL,
                      `comment` text,
                      PRIMARY KEY  (`id`)
-                   ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci";
+                   ) ENGINE=InnoDB  DEFAULT CHARSET = {$default_charset}
+                     COLLATE = {$default_collation} ROW_FORMAT=DYNAMIC";
          $DB->queryOrDie($query, __('Error in creating glpi_plugin_behaviors_configs', 'behaviors').
                                  "<br>".$DB->error());
 
@@ -147,7 +151,7 @@ class PluginBehaviorsConfig extends CommonDBTM {
          $mig->addField($table, 'use_lock',                 'bool');
 
          // Version 0.83.4 - single tech/group #3857
-         $mig->addField($table, 'single_tech_mode',         'integer');
+         $mig->addField($table, 'single_tech_mode', "int {$default_key_sign} NOT NULL DEFAULT '0'");
 
          // Version 0.84.2 - solution description mandatory #2803
          $mig->addField($table, 'is_ticketsolution_mandatory', 'bool');
@@ -215,6 +219,9 @@ class PluginBehaviorsConfig extends CommonDBTM {
          $mig->addField($table, 'is_changetasktodo', 'bool', ['after' => 'is_tickettasktodo']);
          $mig->addField($table, 'is_problemtasktodo', 'bool', ['after' => 'is_tickettasktodo']);
          $mig->addField($table, 'addfup_updatetech', 'bool', ['after' => 'clone']);
+
+         //version 2.7.0
+         $mig->changeField($table, 'date_mod', 'date_mod', "timestamp NULL DEFAULT NULL");
       }
 
    }
@@ -236,8 +243,8 @@ class PluginBehaviorsConfig extends CommonDBTM {
       $config->showFormHeader();
 
       echo "<tr class='tab_bg_1'>";
-      echo "<td colspan='2' class='tab_bg_2 b center' width='60%'>".__('New ticket')."</td>";
-      echo "<td colspan='2' class='tab_bg_2 b center'>".__('Inventory', 'behaviors')."</td>";
+      echo "<th colspan='2' class='center' width='60%'>".__('New ticket')."</th>";
+      echo "<th colspan='2' class='center'>".__('Inventory', 'behaviors')."</th>";
       echo "</tr>";
 
       echo "<tr class='tab_bg_1'>";
@@ -281,9 +288,9 @@ class PluginBehaviorsConfig extends CommonDBTM {
       echo "<td>".__("Use the technician's group", "behaviors")."</td><td>";
       Dropdown::showFromArray('use_assign_user_group', $yesnoall,
                               ['value' => $config->fields['use_assign_user_group']]);
-      echo "</td><td colspan='2' class='tab_bg_2 b center'>"._n('Notification', 'Notifications', 2,
+      echo "</td><th colspan='2' class='center'>"._n('Notification', 'Notifications', 2,
             'behaviors');
-      echo "</td></tr>\n";
+      echo "</th></tr>\n";
 
       echo "<tr class='tab_bg_1'>";
       echo "<td>".__("Requester is mandatory", "behaviors")."</td><td>";
@@ -293,8 +300,8 @@ class PluginBehaviorsConfig extends CommonDBTM {
       echo "</td></tr>";
 
       echo "<tr class='tab_bg_1'>";
-      echo "<td colspan='2' class='tab_bg_2 b center'>".__('Update of a ticket')."</td>";
-      echo "</td><td class='tab_bg_2 b center'>".__('Allow Clone', 'behaviors')."</td><td>";
+      echo "<th colspan='2' class='center'>".__('Update of a ticket')."</th>";
+      echo "</td><td class='tab_bg_2 b'>".__('Allow Clone', 'behaviors')."</td><td>";
 
       $tab = ['0' => __('No'),
               '1' => __("In the active entity", "behaviors"),
@@ -306,8 +313,8 @@ class PluginBehaviorsConfig extends CommonDBTM {
       echo "<td>".__('Duration is mandatory before ticket is solved/closed', 'behaviors')."</td><td>";
       Dropdown::showYesNo("is_ticketrealtime_mandatory",
                           $config->fields['is_ticketrealtime_mandatory']);
-      echo "</td><td colspan=2' class='tab_bg_2 b center'>".__('Update of a problem');
-      echo "</td></tr>";
+      echo "</td><th colspan=2' class='center'>".__('Update of a problem');
+      echo "</th></tr>";
 
       echo "<tr class='tab_bg_1'>";
       echo "<td>".__('Category is mandatory before ticket is solved/closed', 'behaviors')."</td><td>";
@@ -333,8 +340,8 @@ class PluginBehaviorsConfig extends CommonDBTM {
       echo "<td>".__('Category is mandatory when you assign a ticket', 'behaviors')."</td><td>";
       Dropdown::showYesNo("is_ticketcategory_mandatory_on_assign",
                           $config->fields['is_ticketcategory_mandatory_on_assign']);
-      echo "</td><td colspan=2' class='tab_bg_2 b center'>".__('New change');
-      echo "</td></tr>";
+      echo "</td><th colspan=2' class='center'>".__('New change');
+      echo "</th></tr>";
 
       echo "<tr class='tab_bg_1'>";
       echo "<td>".__('Description of solution is mandatory before ticket is solved/closed',
@@ -356,8 +363,8 @@ class PluginBehaviorsConfig extends CommonDBTM {
       echo "</td><td>";
       Dropdown::showYesNo("is_tickettech_mandatory",
                           $config->fields['is_tickettech_mandatory']);
-      echo "</td><td colspan=2' class='tab_bg_2 b center'>".__('Update of a change');
-      echo "</td></tr>";
+      echo "</td><th colspan=2' class='center'>".__('Update of a change');
+      echo "</th></tr>";
 
       echo "<tr class='tab_bg_1'>";
       echo "<td>".__('Group of technicians assigned is mandatory before ticket is solved/closed',
@@ -374,8 +381,8 @@ class PluginBehaviorsConfig extends CommonDBTM {
       echo "<td>".__("Use the technician's group", "behaviors")."</td><td>";
       Dropdown::showFromArray('use_assign_user_group_update', $yesnoall,
                               ['value' => $config->fields['use_assign_user_group_update']]);
-      echo "</td><td colspan='2' class='tab_bg_2 b center'>".__('Comments');
-      echo "</td></tr>\n";
+      echo "</td><th colspan='2' class='center'>".__('Comments');
+      echo "</th></tr>\n";
 
       echo "<tr class='tab_bg_1'>";
       echo "<td>".__('Location is mandatory before ticket is solved/closed', 'behaviors');
@@ -383,7 +390,11 @@ class PluginBehaviorsConfig extends CommonDBTM {
       Dropdown::showYesNo("is_ticketlocation_mandatory",
                            $config->fields['is_ticketlocation_mandatory']);
       echo "<td rowspan='7' colspan='2' class='center'>";
-      echo "<textarea cols='60' rows='12' name='comment' >".$config->fields['comment']."</textarea>";
+      Html::textarea(['name'            => 'comment',
+                      'value'           => $config->fields['comment'],
+                      'cols'            => '60',
+                      'rows'            => '12',
+                      'enable_ricktext' => false]);
       echo "</td></tr>";
 
       echo "<tr class='tab_bg_1'>";
