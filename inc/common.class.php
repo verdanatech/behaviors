@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @version $Id$
  -------------------------------------------------------------------------
@@ -30,23 +31,27 @@
  @since     2010
 
  --------------------------------------------------------------------------
-*/
+ */
 
-class PluginBehaviorsCommon extends CommonGLPI {
+class PluginBehaviorsCommon extends CommonGLPI
+{
 
-   static $clone_types = ['NotificationTemplate'  => 'PluginBehaviorsNotificationTemplate',
-                          'Profile'               => 'PluginBehaviorsProfile',
-                          'RuleImportComputer'    => 'PluginBehaviorsRule',
-                          'RuleImportEntity'      => 'PluginBehaviorsRule',
-                          'RuleMailCollector'     => 'PluginBehaviorsRule',
-                          'RuleRight'             => 'PluginBehaviorsRule',
-                          'RuleSoftwareCategory'  => 'PluginBehaviorsRule',
-                          'RuleTicket'            => 'PluginBehaviorsRule',
-                          'Transfer'              => 'PluginBehaviorsCommon',
-                          'Ticket'                => 'PluginBehaviorsTicket'];
+   static $clone_types = [
+      'NotificationTemplate'  => 'PluginBehaviorsNotificationTemplate',
+      'Profile'               => 'PluginBehaviorsProfile',
+      'RuleImportComputer'    => 'PluginBehaviorsRule',
+      'RuleImportEntity'      => 'PluginBehaviorsRule',
+      'RuleMailCollector'     => 'PluginBehaviorsRule',
+      'RuleRight'             => 'PluginBehaviorsRule',
+      'RuleSoftwareCategory'  => 'PluginBehaviorsRule',
+      'RuleTicket'            => 'PluginBehaviorsRule',
+      'Transfer'              => 'PluginBehaviorsCommon',
+      'Ticket'                => 'PluginBehaviorsTicket'
+   ];
 
 
-   static function getCloneTypes() {
+   static function getCloneTypes()
+   {
       return self::$clone_types;
    }
 
@@ -58,8 +63,9 @@ class PluginBehaviorsCommon extends CommonGLPI {
     * @param $managertype  String   class name which manage the clone actions (default '')
     *
     * @return Boolean
-   **/
-   static function addCloneType($clonetype, $managertype='') {
+    **/
+   static function addCloneType($clonetype, $managertype = '')
+   {
 
       if (!isset(self::$clone_types[$clonetype])) {
          self::$clone_types[$clonetype] = ($managertype ? $managertype : $clonetype);
@@ -70,37 +76,47 @@ class PluginBehaviorsCommon extends CommonGLPI {
    }
 
 
-   static function postInit() {
+   static function postInit()
+   {
 
-      Plugin::registerClass('PluginBehaviorsCommon',
-                            ['addtabon' => array_keys(PluginBehaviorsCommon::getCloneTypes())]);
+      Plugin::registerClass(
+         'PluginBehaviorsCommon',
+         ['addtabon' => array_keys(PluginBehaviorsCommon::getCloneTypes())]
+      );
 
       PluginBehaviorsTicket::onNewTicket();
    }
 
 
-   function getTabNameForItem(CommonGLPI $item, $withtemplate=0) {
+   function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
+   {
 
       $config = PluginBehaviorsConfig::getInstance();
-      if (array_key_exists($item->getType(), self::$clone_types)
-          && $item->canUpdate()
-          && $config->getField('clone')
-          && (isset($_SESSION['glpi_activeprofile']['interface'])
-              && ($_SESSION['glpi_activeprofile']['interface'] != 'helpedk'))) {
-         return sprintf(__('%1$s (%2$s)'), __('Clone', 'behaviors'),
-                        __('Behaviours', 'behaviors'));
+      if (
+         array_key_exists($item->getType(), self::$clone_types)
+         && $item->canUpdate()
+         && ($config->getField('clone') > 0)
+         && (isset($_SESSION['glpiactiveprofile']['interface'])
+            && ($_SESSION['glpiactiveprofile']['interface'] != 'helpdesk'))
+      ) {
+         return sprintf(
+            __('%1$s (%2$s)'),
+            __('Clone', 'behaviors'),
+            __('Behaviours', 'behaviors')
+         );
       }
       return '';
    }
 
 
-   static function showCloneForm(CommonGLPI $item) {
+   static function showCloneForm(CommonGLPI $item)
+   {
 
-      echo "<form name='form' method='post' action='".Toolbox::getItemTypeFormURL(__CLASS__)."' >";
+      echo "<form name='form' method='post' action='" . Toolbox::getItemTypeFormURL(__CLASS__) . "' >";
       echo "<div class='spaced' id='tabsbody'>";
       echo "<table class='tab_cadre_fixe'>";
 
-      echo "<tr><th>".__('Clone', 'behaviors')."</th></tr>";
+      echo "<tr><th>" . __('Clone', 'behaviors') . "</th></tr>";
 
       if ($item->isEntityAssign()) {
          $config = PluginBehaviorsConfig::getInstance();
@@ -111,50 +127,64 @@ class PluginBehaviorsCommon extends CommonGLPI {
             $entities_id = $item->getEntityID();
          }
          echo "<tr class='tab_bg_1'><td class='center'>";
-         printf(__('%1$s: %2$s'), __('Destination entity'),
-                   "<span class='b'>". Dropdown::getDropdownName('glpi_entities',
-                                                                 $entities_id).
-                   "</span>");
+         printf(
+            __('%1$s: %2$s'),
+            __('Destination entity'),
+            "<span class='b'>" . Dropdown::getDropdownName(
+               'glpi_entities',
+               $entities_id
+            ) .
+               "</span>"
+         );
          echo "</td></tr>";
       }
 
       $name = sprintf(__('%1$s %2$s'), __('Clone of', 'behaviors'), $item->getName());
-      echo "<tr class='tab_bg_1'><td class='center'>".sprintf(__('%1$s: %2$s'), __('Name'), $name);
-      echo Html::input('name', ['value' => $name,
-                                'size'  => 60]);
+      echo "<tr class='tab_bg_1'><td class='center'>" . sprintf(__('%1$s: %2$s'), __('Name'), $name);
+      echo Html::input('name', [
+         'value' => $name,
+         'size'  => 60
+      ]);
       echo Html::hidden('itemtype', ['value' => $item->getType()]);
       echo Html::hidden('id', ['value' => $item->getID()]);
       echo "</td></tr>";
 
       echo "<tr class='tab_bg_1'><td class='center'>";
-      echo Html::submit(__('Clone', 'behaviors'), ['name' => '_clone',
-                                   'class' => 'btn btn-primary']);
+      echo Html::submit(__('Clone', 'behaviors'), [
+         'name' => '_clone',
+         'class' => 'btn btn-primary'
+      ]);
       echo "</th></tr>";
 
       echo "</table></div>";
       Html::closeForm();
-
    }
 
 
-   static function displayTabContentForItem(CommonGLPI $item, $tabnum=1, $withtemplate=0) {
+   static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
+   {
 
-      if (array_key_exists($item->getType(), self::$clone_types)
-          && $item->canUpdate()) {
+      if (
+         array_key_exists($item->getType(), self::$clone_types)
+         && $item->canUpdate()
+      ) {
          self::showCloneForm($item);
       }
       return true;
    }
 
 
-   static function cloneItem(Array $param) {
-toolbox::logdebug("param", $param);
+   static function cloneItem(array $param)
+   {
+      toolbox::logdebug("param", $param);
       $dbu = new DbUtils();
       // Sanity check
-      if (!isset($param['itemtype']) || !isset($param['id']) || !isset($param['name'])
-          || !array_key_exists($param['itemtype'], self::$clone_types)
-          || empty($param['name'])
-          || !($item = $dbu->getItemForItemtype($param['itemtype']))) {
+      if (
+         !isset($param['itemtype']) || !isset($param['id']) || !isset($param['name'])
+         || !array_key_exists($param['itemtype'], self::$clone_types)
+         || empty($param['name'])
+         || !($item = $dbu->getItemForItemtype($param['itemtype']))
+      ) {
          return false;
       }
 
@@ -178,7 +208,7 @@ toolbox::logdebug("param", $param);
       }
 
       // Manage NULL fields in original
-      foreach($input as $k => $v) {
+      foreach ($input as $k => $v) {
          if (is_null($input[$k])) {
             $input[$k] = "NULL";
          }
@@ -186,8 +216,11 @@ toolbox::logdebug("param", $param);
 
       // Specific to itemtype - before clone
       if (method_exists(self::$clone_types[$param['itemtype']], 'preClone')) {
-         $input = call_user_func([self::$clone_types[$param['itemtype']], 'preClone'],
-                                 $item, $input);
+         $input = call_user_func(
+            [self::$clone_types[$param['itemtype']], 'preClone'],
+            $item,
+            $input
+         );
       }
 
       // Clone
@@ -205,10 +238,18 @@ toolbox::logdebug("param", $param);
       if ($clone->dohistory) {
          $changes[0] = '0';
          $changes[1] = '';
-         $changes[2] = addslashes(sprintf(__('%1$s %2$s'), __('Clone of', 'behaviors'),
-                                             $item->getNameID(0, true)));
-         Log::history($clone->getID(), $clone->getType(), $changes, 0,
-                      Log::HISTORY_LOG_SIMPLE_MESSAGE);
+         $changes[2] = addslashes(sprintf(
+            __('%1$s %2$s'),
+            __('Clone of', 'behaviors'),
+            $item->getNameID(0, true)
+         ));
+         Log::history(
+            $clone->getID(),
+            $clone->getType(),
+            $changes,
+            0,
+            Log::HISTORY_LOG_SIMPLE_MESSAGE
+         );
       }
    }
 }
