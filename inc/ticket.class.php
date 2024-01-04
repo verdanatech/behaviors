@@ -358,11 +358,13 @@ class PluginBehaviorsTicket {
          }
       }
 
-      if ($config->getField('use_requester_user_group') > 0
-          && isset($ticket->input['_actors'])) {
-         $actors = $ticket->input['_actors'];
-
-         //for simplified interface
+      if ($config->getField('use_requester_user_group') > 0) {
+          
+         if (isset($ticket->input['_actors'])) {
+              $actors = ($ticket->input['_actors'] ?? []);
+         }
+         
+         //for simplified interface or mailgate
          if (!isset($actors['requester']) && isset($ticket->input['_users_id_requester'])) {
             $actors['requester'][] = ['itemtype'          => 'User',
                                       'items_id'          => $ticket->input['_users_id_requester'],
@@ -416,6 +418,61 @@ class PluginBehaviorsTicket {
             }
          }
          $ticket->input['_actors'] = $actors;
+      }
+      
+      if ($config->getField('use_assign_user_group') > 0) {
+          
+          if (isset($ticket->input['_actors'])) {
+              $actors = ($ticket->input['_actors'] ?? []);
+          }
+          
+          if (isset($actors['assign'])) {
+              $assigns = $actors['assign'];
+              // Select first group of this user
+              $ko   = 0;
+              $grp  = 0;
+              $grps = [];
+              foreach ($assigns as $assign) {
+                  if ($config->getField('use_assign_user_group') == 1) {
+                      // First group
+                      if ($assign['itemtype'] == 'User') {
+                          $grp = PluginBehaviorsUser::getTechnicianGroup($ticket->input['entities_id'],
+                                                                         $assign['items_id'],
+                                                                         true);
+                      }
+                      if ($grp > 0 && $assign['itemtype'] == 'Group'
+                          && $assign['items_id'] == $grp) {
+                              $ko++;
+                          }
+                          if ($grp > 0 && $ko == 0) {
+                              $actors['assign'][] = ['itemtype'          => 'Group',
+                                                     'items_id'          => $grp,
+                                                     'use_notification'  => "1",
+                                                     'alternative_email' => ""];
+                          }
+                  } else {
+                      // All groups
+                      if ($assign['itemtype'] == 'User') {
+                          $grps = PluginBehaviorsUser::getTechnicianGroup($ticket->input['entities_id'],
+                                                                          $assign['items_id'],
+                                                                          false);
+                      }
+                      if ($assign['itemtype'] == 'Group'
+                          && in_array($assign['items_id'], $grps)) {
+                              unset($grps[$assign['items_id']]);
+                          }
+                          if (count($grps) > 0) {
+                              foreach ($grps as $grp) {
+                                  $actors['assign'][] = ['itemtype'          => 'Group',
+                                                         'items_id'          => $grp,
+                                                         'use_notification'  => "1",
+                                                         'alternative_email' => ""];
+                              }
+                          }
+                  }
+              }
+          }
+          $ticket->input['_actors'] = $actors;
       }
       if ($config->getField('ticketsolved_updatetech')
           && (isset($ticket->input['status'])
@@ -501,21 +558,26 @@ class PluginBehaviorsTicket {
           && in_array($ticket->input['status'], array_merge(Ticket::getSolvedStatusArray(),
                                                             Ticket::getClosedStatusArray()))) {
 
-         $soluce = $DB->request('glpi_itilsolutions',
-                                ['itemtype'   => 'Ticket',
-                                 'items_id'   => $ticket->input['id']]);
-
-         if ($config->getField('is_ticketsolutiontype_mandatory')
-             && !count($soluce)) {
-            unset($ticket->input['status']);
-            Session::addMessageAfterRedirect(__("Type of solution is mandatory before ticket is solved/closed",
-                                                'behaviors'), true, ERROR);
-         }
-         if ($config->getField('is_ticketsolution_mandatory')
-             && !count($soluce)) {
-            unset($ticket->input['status']);
-            Session::addMessageAfterRedirect(__("Description of solution is mandatory before ticket is solved/closed",
-                                                'behaviors'), true, ERROR);
+         $sql = ['SELECT' => ['MAX' => 'id AS max',
+                              'solutiontypes_id', 'content'],
+                 'FROM'   => 'glpi_itilsolutions',
+                 'WHERE'  => ['items_id' => $ticket->getID(),
+                              'itemtype' => 'Ticket']];
+         
+         foreach ($DB->request($sql) as $data) {
+             
+            if ($config->getField('is_ticketsolutiontype_mandatory')
+                && ($data['solutiontypes_id'] == 0)) {
+               unset($ticket->input['status']);
+               Session::addMessageAfterRedirect(__("Type of solution is mandatory before ticket is solved/closed",
+                                                   'behaviors'), true, ERROR);
+            }
+            if ($config->getField('is_ticketsolution_mandatory')
+                && empty($data['content'])) {
+               unset($ticket->input['status']);
+               Session::addMessageAfterRedirect(__("Description of solution is mandatory before ticket is solved/closed",
+                                                   'behaviors'), true, ERROR);
+            }
          }
 
          $dur     = (isset($ticket->input['actiontime'])
@@ -597,16 +659,13 @@ class PluginBehaviorsTicket {
           && isset($ticket->input['items_id'])
           && (is_array($ticket->input['items_id']))) {
          foreach ($ticket->input['items_id'] as $type => $items) {
-            foreach ($items as $number => $id) {
-               if (($item = $dbu->getItemForItemtype($type))
-                   && !isset($ticket->input['_itil_requester']['groups_id'])) {
-                  if ($item->isField('groups_id')) {
-                     foreach ($items as $itemid) {
-                        if ($item->getFromDB($itemid)) {
-                           $ticket->input['_itil_requester']
-                                 = ['_type' => 'group',
-                                    'groups_id' => $item->getField('groups_id')];
-                        }
+            if (($item = $dbu->getItemForItemtype($type))
+                && !isset($ticket->input['_itil_requester']['groups_id'])) {
+               if ($item->isField('groups_id')) {
+                  foreach ($items as $itemid) {
+                     if ($item->getFromDB($itemid)) {
+                        $ticket->input['_itil_requester'] = ['_type' => 'group',
+                                                             'groups_id' => $item->getField('groups_id')];
                      }
                   }
                }
@@ -637,13 +696,11 @@ class PluginBehaviorsTicket {
           && $ticket->canUpdate()
           && isset($ticket->input['status'])
           && in_array($ticket->input['status'], array_merge(Ticket::getSolvedStatusArray(),
-                                                            Ticket::getClosedStatusArray()))) {
-
-         $ticket_user      = new Ticket_User();
-         if ((!$ticket_user->getFromDBByCrit(['tickets_id' => $ticket->fields['id'],
-                                              'type'       => CommonITILActor::ASSIGN])
+                                                            Ticket::getClosedStatusArray()))) {       
+         $ticket_user      = new Ticket_User();         
+         if (($ticket->countUsers(CommonITILActor::ASSIGN) == 0)
              || (isset($ticket_user->fields['users_id'])
-                       && ($ticket_user->fields['users_id'] != Session::getLoginUserID())))
+                       && ($ticket_user->fields['users_id'] != Session::getLoginUserID()))
              && (((in_array($ticket->fields['status'], Ticket::getSolvedStatusArray()))
                   && (in_array($ticket->input['status'], Ticket::getClosedStatusArray())))
                   || !in_array($ticket->fields['status'], array_merge(Ticket::getSolvedStatusArray(),

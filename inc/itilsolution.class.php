@@ -56,8 +56,8 @@ class PluginBehaviorsITILSolution {
           && ($soluce->input['itemtype'] == 'Ticket')) {
 
          if ($config->getField('is_ticketsolutiontype_mandatory')
-             && !isset($soluce->input['solutiontypes_id'])){
-            $soluce->input = false;
+             && empty($soluce->input['solutiontypes_id'])) {
+             $soluce->input = false;
             Session::addMessageAfterRedirect(__("Type of solution is mandatory before ticket is solved/closed",
                                                 'behaviors'), true, ERROR);
             return;
@@ -124,8 +124,7 @@ class PluginBehaviorsITILSolution {
           && ($soluce->input['itemtype'] == 'Problem')) {
 
          if ($config->getField('is_problemsolutiontype_mandatory')
-             && ($soluce->input['solutiontypes_id']
-                 && ($soluce->input['solutiontypes_id'] == 0))) {
+             && empty($soluce->input['solutiontypes_id'])) {
             $soluce->input = false;
             Session::addMessageAfterRedirect(__("Type of solution is mandatory before problem is solved/closed",
                                                 'behaviors'), true, ERROR);
@@ -165,7 +164,7 @@ class PluginBehaviorsITILSolution {
 
 
    static function beforeUpdate(ITILSolution $soluce) {
-
+      
       if (!is_array($soluce->input) || !count($soluce->input)) {
          // Already cancel by another plugin
          return false;
@@ -183,7 +182,7 @@ class PluginBehaviorsITILSolution {
       // Wand to solve/close the ticket
       if ($config->getField('is_ticketsolutiontype_mandatory')
           && $soluce->input['itemtype'] == 'Ticket') {
-         if (empty($soluce->input['solutiontypes_id'])) {
+         if (empty($soluce->input['solutiontypes_id']) || ($soluce->input['solutiontypes_id'] == 0)) {
             $soluce->input['content'] = $soluce->fields['content'];
             $soluce->input['solutiontypes_id'] = $soluce->fields['solutiontypes_id'];
             Session::addMessageAfterRedirect(__("Type of solution is mandatory before ticket is solved/closed",
