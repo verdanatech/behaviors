@@ -597,6 +597,7 @@ class PluginBehaviorsTicket {
          }
          if ($config->getField('is_ticketcategory_mandatory')) {
             if (!$cat) {
+               
                unset($ticket->input['status']);
                Session::addMessageAfterRedirect(__("Category is mandatory before ticket is solved/closed",
                                                    'behaviors'), true, ERROR);
@@ -646,7 +647,7 @@ class PluginBehaviorsTicket {
              && isset($ticket->input['_itil_assign'])
              && ($ticket->input['_itil_assign']['users_id']
                  || $ticket->input['_itil_assign']['groups_id'])) {
-            unset($ticket->input);
+                  unset($ticket->input['_itil_assign']);
             Session::addMessageAfterRedirect(__("Category is mandatory when you assign a ticket",
                                              'behaviors'), true, ERROR);
          }
