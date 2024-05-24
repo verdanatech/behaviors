@@ -54,7 +54,6 @@ class PluginBehaviorsITILSolution {
       $ticket = new Ticket();
       if ($ticket->getFromDB($soluce->input['items_id'])
           && ($soluce->input['itemtype'] == 'Ticket')) {
-
          if ($config->getField('is_ticketsolutiontype_mandatory')
              && empty($soluce->input['solutiontypes_id'])) {
              $soluce->input = false;
