@@ -523,7 +523,7 @@ class PluginBehaviorsTicket {
          // Already cancel by another plugin
          return false;
       }
-
+    
       $dbu    = new DbUtils();
       $config = PluginBehaviorsConfig::getInstance();
 
@@ -555,16 +555,17 @@ class PluginBehaviorsTicket {
           && in_array($ticket->input['status'], array_merge(Ticket::getSolvedStatusArray(),
                                                             Ticket::getClosedStatusArray()))) {
 
-         $sql = ['SELECT' => ['MAX' => 'id AS max',
+         $sql = ['SELECT' => [ 'id AS max',
                               'solutiontypes_id', 'content'],
                  'FROM'   => 'glpi_itilsolutions',
                  'WHERE'  => ['items_id' => $ticket->getID(),
-                              'itemtype' => 'Ticket']];
-         
+                              'itemtype' => 'Ticket'],
+                 'ORDER' => "id DESC",
+               'LIMIT' =>1];
          foreach ($DB->request($sql) as $data) {
-             
             if ($config->getField('is_ticketsolutiontype_mandatory')
                 && ($data['solutiontypes_id'] == 0)) {
+           
                unset($ticket->input['status']);
                Session::addMessageAfterRedirect(__("Type of solution is mandatory before ticket is solved/closed",
                                                    'behaviors'), true, ERROR);
