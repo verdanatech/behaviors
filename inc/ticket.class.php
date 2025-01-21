@@ -554,30 +554,48 @@ class PluginBehaviorsTicket {
       if (isset($ticket->input['status'])
           && in_array($ticket->input['status'], array_merge(Ticket::getSolvedStatusArray(),
                                                             Ticket::getClosedStatusArray()))) {
-
-         $sql = ['SELECT' => [ 'id AS max',
-                              'solutiontypes_id', 'content'],
-                 'FROM'   => 'glpi_itilsolutions',
-                 'WHERE'  => ['items_id' => $ticket->getID(),
-                              'itemtype' => 'Ticket'],
-                 'ORDER' => "id DESC",
-               'LIMIT' =>1];
-         foreach ($DB->request($sql) as $data) {
-            if ($config->getField('is_ticketsolutiontype_mandatory')
-                && ($data['solutiontypes_id'] == 0)) {
-           
-               unset($ticket->input['status']);
-               Session::addMessageAfterRedirect(__("Type of solution is mandatory before ticket is solved/closed",
-                                                   'behaviors'), true, ERROR);
-            }
-            if ($config->getField('is_ticketsolution_mandatory')
-                && empty($data['content'])) {
-               unset($ticket->input['status']);
-               Session::addMessageAfterRedirect(__("Description of solution is mandatory before ticket is solved/closed",
-                                                   'behaviors'), true, ERROR);
-            }
-         }
-
+                                                               $iterator = $DB->request([
+                                                                  'SELECT' => [
+                                                                      'id AS max',
+                                                                      'solutiontypes_id',
+                                                                      'content'
+                                                                  ],
+                                                                  'FROM'   => 'glpi_itilsolutions',
+                                                                  'WHERE'  => [
+                                                                      'items_id' => $ticket->getID(),
+                                                                      'itemtype' => 'Ticket'
+                                                                  ],
+                                                                  'ORDER' => "id DESC",
+                                                                  'LIMIT' => 1
+                                                              ]);
+                                                              $number = count($iterator);
+                                                              $values = [];
+                                                              if ($number) {
+                                                              
+foreach ($iterator as $data) {
+                                                                      if ($config->getField('is_ticketsolutiontype_mandatory') && ($data['solutiontypes_id'] == 0)) {
+                                                                          unset($ticket->input['status']);
+         Session::addMessageAfterRedirect(__("Type of solution is mandatory before ticket is solved/closed", 'behaviors'), true, ERROR);
+     }
+    if ($config->getField('is_ticketsolution_mandatory') && empty($data['content'])
+       ) {
+        unset($ticket->input['status']);
+       Session::addMessageAfterRedirect(__(
+       "Description of solution is mandatory before ticket is solved/closed",
+        'behaviors'
+     ), true, ERROR);
+     }
+     }
+   } else {
+                                                                  if ($config->getField('is_ticketsolutiontype_mandatory') ||  $config->getField('is_ticketsolution_mandatory')) {
+                                                                      unset($ticket->input['status']);
+                                                                      Session::addMessageAfterRedirect(__(
+                                                                          "Descreva a solução!"
+        ), true, ERROR);
+     }
+ }
+                                                              
+                                                      
          $dur     = (isset($ticket->input['actiontime'])
                         ? $ticket->input['actiontime']
                         : $ticket->fields['actiontime']);
