@@ -266,3 +266,14 @@ msgstr ""
 #: inc/tickettask.class.php:96
 msgid "You cannot change status of a task in a solved ticket"
 msgstr ""
+
+
+#: inc/config.class.php:452
+msgid "Knowbase Item is mandatory before request is solved/closed"
+msgstr ""
+
+
+#: inc/config.class.php:458
+msgid "Knowbase Item is mandatory before incident is solved/closed"
+msgstr ""
+

@@ -240,6 +240,16 @@ class PluginBehaviorsCommon extends CommonGLPI {
          $cat = (isset($obj->fields['itilcategories_id']) ? $obj->fields['itilcategories_id'] : 0);
          $loc = (isset($obj->fields['locations_id']) ? $obj->fields['locations_id'] : 0);
 
+         $params = [
+            'itemtype'         => 'Ticket',
+            'items_id'         => $obj->fields['id']
+        ];
+        $existing = $DB->request(
+            'glpi_knowbaseitems_items',
+            $params
+        );
+   
+
       if ($obj->getType() == 'Ticket') {
          $mandatory_solution = false;
          if ($config->getField('is_ticketrealtime_mandatory')) {
@@ -272,9 +282,19 @@ class PluginBehaviorsCommon extends CommonGLPI {
 
          if ($config->getField('is_tickettechgroup_mandatory')) {
             if (($obj->countGroups(CommonITILActor::ASSIGN) == 0)) {
-
                $warnings[] = __("Group of technicians assigned is mandatory before ticket is solved/closed",
                                 'behaviors');
+            }
+         }
+         if ($config->getField('is_knowbaseincident_mandatory') && $obj->fields['type'] == Ticket::INCIDENT_TYPE) {
+            if ($existing->numrows() == 0) {
+               $warnings[] = __("Knowbase Item is mandatory before incident is solved/closed", 'behaviors');
+            }
+         }
+
+         if ($config->getField('is_knowbaserequest_mandatory') && $obj->fields['type'] == Ticket::DEMAND_TYPE) {
+            if ($existing->numrows() == 0) {
+               $warnings[] = __("Knowbase Item is mandatory before request is solved/closed", 'behaviors');
             }
          }
 

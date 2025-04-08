@@ -222,6 +222,9 @@ class PluginBehaviorsConfig extends CommonDBTM {
 
          //version 2.7.0
          $mig->changeField($table, 'date_mod', 'date_mod', "timestamp NULL DEFAULT NULL");
+
+         $mig->addField($table, 'is_knowbaserequest_mandatory', 'bool', ['after' => 'is_tickettasktodo']);
+         $mig->addField($table, 'is_knowbaseincident_mandatory', 'bool', ['after' => 'is_knowbaserequest_mandatory']);
       }
 
    }
@@ -443,6 +446,18 @@ class PluginBehaviorsConfig extends CommonDBTM {
       echo "<td>". __('Technician assignment when adding follow up', 'behaviors');
       echo "</td><td>";
       Dropdown::showYesNo("addfup_updatetech", $config->fields['addfup_updatetech']);
+      echo "</td><td colspan='2'></td></tr>";
+
+      echo "<tr class='tab_bg_1'>";
+      echo "<td>". __('Knowbase Item is mandatory before request is solved/closed', 'behaviors');
+      echo "</td><td>";
+      Dropdown::showYesNo("is_knowbaserequest_mandatory", $config->fields['is_knowbaserequest_mandatory']);
+      echo "</td><td colspan='2'></td></tr>";
+
+      echo "<tr class='tab_bg_1'>";
+      echo "<td>". __('Knowbase Item is mandatory before incident is solved/closed', 'behaviors');
+      echo "</td><td>";
+      Dropdown::showYesNo("is_knowbaseincident_mandatory", $config->fields['is_knowbaseincident_mandatory']);
       echo "</td><td colspan='2'></td></tr>";
 
       echo "<tr class='tab_bg_1'>";

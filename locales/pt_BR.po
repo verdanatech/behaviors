@@ -269,3 +269,13 @@ msgstr "Não foi possível salvar, o item foi atualizado"
 #: inc/tickettask.class.php:96
 msgid "You cannot change status of a task in a solved ticket"
 msgstr "Você não pode alterar o status de uma tarefa em um chamado resolvido"
+
+#: inc/config.class.php:452
+msgid "Knowbase Item is mandatory before request is solved/closed"
+msgstr "Item da base de conhecimento é obrigatório antes que a requisição seja solucionada/fechada"
+
+
+#: inc/config.class.php:458
+msgid "Knowbase Item is mandatory before incident is solved/closed"
+msgstr "Item da base de conhecimento é obrigatório antes que o incidente seja solucionado/fechado"
+
