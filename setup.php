@@ -65,7 +65,10 @@ function plugin_init_behaviors() {
        'ITILSolution'       => ['PluginBehaviorsITILSolution',      'beforeUpdate'],
        'TicketTask'         => ['PluginBehaviorsTickettask',        'beforeUpdate'],
        'ChangeTask'         => ['PluginBehaviorsChangetask',        'beforeUpdate'],
-       'ProblemTask'        => ['PluginBehaviorsProblemtask',       'beforeUpdate']];
+       'ProblemTask'        => ['PluginBehaviorsProblemtask',       'beforeUpdate'],
+       'ProblemTask'        => ['PluginBehaviorsProblemtask',       'beforeUpdate'],
+       'ProjectTask'        => ['PluginBehaviorsProjectTask',       'beforeUpdate'],
+       'Project'        => ['PluginBehaviorsProject',       'beforeUpdate']];
 
    $PLUGIN_HOOKS['pre_item_purge']['behaviors'] =
       ['Computer'           => ['PluginBehaviorsComputer',          'beforePurge']];
@@ -103,7 +106,7 @@ function plugin_init_behaviors() {
 function plugin_version_behaviors() {
 
    return ['name'           => __('Behaviours', 'behaviors'),
-           'version'        => '2.7.4',
+           'version'        => '2.7.3.1',
            'license'        => 'AGPLv3+',
            'author'         => 'Remi Collet, Nelly Mahu-Lasson',
            'homepage'       => 'https://github.com/yllen/behaviors',
