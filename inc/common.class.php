@@ -31,21 +31,25 @@
  --------------------------------------------------------------------------
 */
 
-class PluginBehaviorsCommon extends CommonGLPI {
+class PluginBehaviorsCommon extends CommonGLPI
+{
 
-   static $clone_types = ['NotificationTemplate'  => 'PluginBehaviorsNotificationTemplate',
-                          'Profile'               => 'PluginBehaviorsProfile',
-                          'RuleImportComputer'    => 'PluginBehaviorsRule',
-                          'RuleImportEntity'      => 'PluginBehaviorsRule',
-                          'RuleMailCollector'     => 'PluginBehaviorsRule',
-                          'RuleRight'             => 'PluginBehaviorsRule',
-                          'RuleSoftwareCategory'  => 'PluginBehaviorsRule',
-                          'RuleTicket'            => 'PluginBehaviorsRule',
-                          'Transfer'              => 'PluginBehaviorsCommon',
-                          'Ticket'                => 'PluginBehaviorsTicket'];
+   static $clone_types = [
+      'NotificationTemplate' => 'PluginBehaviorsNotificationTemplate',
+      'Profile' => 'PluginBehaviorsProfile',
+      'RuleImportComputer' => 'PluginBehaviorsRule',
+      'RuleImportEntity' => 'PluginBehaviorsRule',
+      'RuleMailCollector' => 'PluginBehaviorsRule',
+      'RuleRight' => 'PluginBehaviorsRule',
+      'RuleSoftwareCategory' => 'PluginBehaviorsRule',
+      'RuleTicket' => 'PluginBehaviorsRule',
+      'Transfer' => 'PluginBehaviorsCommon',
+      'Ticket' => 'PluginBehaviorsTicket'
+   ];
 
 
-   static function getCloneTypes() {
+   static function getCloneTypes()
+   {
       return self::$clone_types;
    }
 
@@ -57,8 +61,9 @@ class PluginBehaviorsCommon extends CommonGLPI {
     * @param $managertype  String   class name which manage the clone actions (default '')
     *
     * @return Boolean
-   **/
-   static function addCloneType($clonetype, $managertype='') {
+    **/
+   static function addCloneType($clonetype, $managertype = '')
+   {
 
       if (!isset(self::$clone_types[$clonetype])) {
          self::$clone_types[$clonetype] = ($managertype ? $managertype : $clonetype);
@@ -69,38 +74,48 @@ class PluginBehaviorsCommon extends CommonGLPI {
    }
 
 
-   static function postInit() {
+   static function postInit()
+   {
 
-      Plugin::registerClass('PluginBehaviorsCommon',
-                            ['addtabon' => array_keys(PluginBehaviorsCommon::getCloneTypes())]);
+      Plugin::registerClass(
+         'PluginBehaviorsCommon',
+         ['addtabon' => array_keys(PluginBehaviorsCommon::getCloneTypes())]
+      );
 
       PluginBehaviorsTicket::onNewTicket();
    }
 
 
-   function getTabNameForItem(CommonGLPI $item, $withtemplate=0) {
+   function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
+   {
 
       $config = PluginBehaviorsConfig::getInstance();
 
-      if (array_key_exists($item->getType(), self::$clone_types)
-          && $item->canUpdate()
-          && ($config->getField('clone') > 0)
-          && (isset($_SESSION['glpiactiveprofile']['interface'])
-              && ($_SESSION['glpiactiveprofile']['interface'] != 'helpdesk'))) {
-         return sprintf(__('%1$s (%2$s)'), __('Clone', 'behaviors'),
-                        __('Behaviours', 'behaviors'));
+      if (
+         array_key_exists($item->getType(), self::$clone_types)
+         && $item->canUpdate()
+         && ($config->getField('clone') > 0)
+         && (isset($_SESSION['glpiactiveprofile']['interface'])
+            && ($_SESSION['glpiactiveprofile']['interface'] != 'helpdesk'))
+      ) {
+         return sprintf(
+            __('%1$s (%2$s)'),
+            __('Clone', 'behaviors'),
+            __('Behaviours', 'behaviors')
+         );
       }
       return '';
    }
 
 
-   static function showCloneForm(CommonGLPI $item) {
+   static function showCloneForm(CommonGLPI $item)
+   {
 
-      echo "<form name='form' method='post' action='".Toolbox::getItemTypeFormURL(__CLASS__)."' >";
+      echo "<form name='form' method='post' action='" . Toolbox::getItemTypeFormURL(__CLASS__) . "' >";
       echo "<div class='spaced' id='tabsbody'>";
       echo "<table class='tab_cadre_fixe'>";
 
-      echo "<tr><th>".__('Clone', 'behaviors')."</th></tr>";
+      echo "<tr><th>" . __('Clone', 'behaviors') . "</th></tr>";
 
       if ($item->isEntityAssign()) {
          $config = PluginBehaviorsConfig::getInstance();
@@ -111,24 +126,33 @@ class PluginBehaviorsCommon extends CommonGLPI {
             $entities_id = $item->getEntityID();
          }
          echo "<tr class='tab_bg_1'><td class='center'>";
-         printf(__('%1$s: %2$s'), __('Destination entity'),
-                   "<span class='b'>". Dropdown::getDropdownName('glpi_entities',
-                                                                 $entities_id).
-                   "</span>");
+         printf(
+            __('%1$s: %2$s'),
+            __('Destination entity'),
+            "<span class='b'>" . Dropdown::getDropdownName(
+               'glpi_entities',
+               $entities_id
+            ) .
+            "</span>"
+         );
          echo "</td></tr>";
       }
 
       $name = sprintf(__('%1$s %2$s'), __('Clone of', 'behaviors'), $item->getName());
-      echo "<tr class='tab_bg_1'><td class='center'>".sprintf(__('%1$s: %2$s'), __('Name'), $name);
-      echo Html::input('name', ['value' => $name,
-                                'size'  => 60]);
+      echo "<tr class='tab_bg_1'><td class='center'>" . sprintf(__('%1$s: %2$s'), __('Name'), $name);
+      echo Html::input('name', [
+         'value' => $name,
+         'size' => 60
+      ]);
       echo Html::hidden('itemtype', ['value' => $item->getType()]);
       echo Html::hidden('id', ['value' => $item->getID()]);
       echo "</td></tr>";
 
       echo "<tr class='tab_bg_1'><td class='center'>";
-      echo Html::submit(__('Clone', 'behaviors'), ['name' => '_clone',
-                                                   'class' => 'btn btn-primary']);
+      echo Html::submit(__('Clone', 'behaviors'), [
+         'name' => '_clone',
+         'class' => 'btn btn-primary'
+      ]);
       echo "</th></tr>";
 
       echo "</table></div>";
@@ -137,24 +161,30 @@ class PluginBehaviorsCommon extends CommonGLPI {
    }
 
 
-   static function displayTabContentForItem(CommonGLPI $item, $tabnum=1, $withtemplate=0) {
+   static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
+   {
 
-      if (array_key_exists($item->getType(), self::$clone_types)
-          && $item->canUpdate()) {
+      if (
+         array_key_exists($item->getType(), self::$clone_types)
+         && $item->canUpdate()
+      ) {
          self::showCloneForm($item);
       }
       return true;
    }
 
 
-   static function cloneItem(Array $param) {
+   static function cloneItem(array $param)
+   {
 
       $dbu = new DbUtils();
       // Sanity check
-      if (!isset($param['itemtype']) || !isset($param['id']) || !isset($param['name'])
-          || !array_key_exists($param['itemtype'], self::$clone_types)
-          || empty($param['name'])
-          || !($item = $dbu->getItemForItemtype($param['itemtype']))) {
+      if (
+         !isset($param['itemtype']) || !isset($param['id']) || !isset($param['name'])
+         || !array_key_exists($param['itemtype'], self::$clone_types)
+         || empty($param['name'])
+         || !($item = $dbu->getItemForItemtype($param['itemtype']))
+      ) {
          return false;
       }
 
@@ -162,8 +192,8 @@ class PluginBehaviorsCommon extends CommonGLPI {
       $item->check($param['id'], READ);
 
       $input = ToolBox::addslashes_deep($item->fields);
-      $input['name']    = $param['name'];
-      $input['_add']    = 1;
+      $input['name'] = $param['name'];
+      $input['_add'] = 1;
       $input['_old_id'] = $input['id'];
       unset($input['id']);
       if ($item->isEntityAssign()) {
@@ -178,7 +208,7 @@ class PluginBehaviorsCommon extends CommonGLPI {
       }
 
       // Manage NULL fields in original
-      foreach($input as $k => $v) {
+      foreach ($input as $k => $v) {
          if (is_null($input[$k])) {
             $input[$k] = "NULL";
          }
@@ -186,8 +216,11 @@ class PluginBehaviorsCommon extends CommonGLPI {
 
       // Specific to itemtype - before clone
       if (method_exists(self::$clone_types[$param['itemtype']], 'preClone')) {
-         $input = call_user_func([self::$clone_types[$param['itemtype']], 'preClone'],
-                                 $item, $input);
+         $input = call_user_func(
+            [self::$clone_types[$param['itemtype']], 'preClone'],
+            $item,
+            $input
+         );
       }
 
       // Clone
@@ -205,10 +238,18 @@ class PluginBehaviorsCommon extends CommonGLPI {
       if ($clone->dohistory) {
          $changes[0] = '0';
          $changes[1] = '';
-         $changes[2] = addslashes(sprintf(__('%1$s %2$s'), __('Clone of', 'behaviors'),
-                                             $item->getNameID(0, true)));
-         Log::history($clone->getID(), $clone->getType(), $changes, 0,
-                      Log::HISTORY_LOG_SIMPLE_MESSAGE);
+         $changes[2] = addslashes(sprintf(
+            __('%1$s %2$s'),
+            __('Clone of', 'behaviors'),
+            $item->getNameID(0, true)
+         ));
+         Log::history(
+            $clone->getID(),
+            $clone->getType(),
+            $changes,
+            0,
+            Log::HISTORY_LOG_SIMPLE_MESSAGE
+         );
       }
    }
 
@@ -219,7 +260,8 @@ class PluginBehaviorsCommon extends CommonGLPI {
     *
     * @return string
     **/
-   static function checkWarnings($params) {
+   static function checkWarnings($params)
+   {
       global $DB;
 
       $warnings = [];
@@ -227,28 +269,30 @@ class PluginBehaviorsCommon extends CommonGLPI {
 
       $config = PluginBehaviorsConfig::getInstance();
 
-         // Check is the connected user is a tech
-         if (!is_numeric(Session::getLoginUserID(false))
-            || (!Session::haveRight('ticket', UPDATE)
-                && !Session::haveRight('problem', UPDATE)
-                && !Session::haveRight('change', UPDATE))) {
-            return false; // No check
-         }
+      // Check is the connected user is a tech
+      if (
+         !is_numeric(Session::getLoginUserID(false))
+         || (!Session::haveRight('ticket', UPDATE)
+            && !Session::haveRight('problem', UPDATE)
+            && !Session::haveRight('change', UPDATE))
+      ) {
+         return false; // No check
+      }
 
-         // Want to solve/close the ticket
-         $dur = (isset($obj->fields['actiontime']) ? $obj->fields['actiontime'] : 0);
-         $cat = (isset($obj->fields['itilcategories_id']) ? $obj->fields['itilcategories_id'] : 0);
-         $loc = (isset($obj->fields['locations_id']) ? $obj->fields['locations_id'] : 0);
+      // Want to solve/close the ticket
+      $dur = (isset($obj->fields['actiontime']) ? $obj->fields['actiontime'] : 0);
+      $cat = (isset($obj->fields['itilcategories_id']) ? $obj->fields['itilcategories_id'] : 0);
+      $loc = (isset($obj->fields['locations_id']) ? $obj->fields['locations_id'] : 0);
 
-         $params = [
-            'itemtype'         => 'Ticket',
-            'items_id'         => $obj->fields['id']
-        ];
-        $existing = $DB->request(
-            'glpi_knowbaseitems_items',
-            $params
-        );
-   
+      $params = [
+         'itemtype' => 'Ticket',
+         'items_id' => $obj->fields['id']
+      ];
+      $existing = $DB->request(
+         'glpi_knowbaseitems_items',
+         $params
+      );
+
 
       if ($obj->getType() == 'Ticket') {
          $mandatory_solution = false;
@@ -272,18 +316,24 @@ class PluginBehaviorsCommon extends CommonGLPI {
          }
 
          if ($config->getField('is_tickettech_mandatory')) {
-            if (($obj->countUsers(CommonITILActor::ASSIGN) == 0)
-                && !$config->getField('ticketsolved_updatetech')) {
+            if (
+               ($obj->countUsers(CommonITILActor::ASSIGN) == 0)
+               && !$config->getField('ticketsolved_updatetech')
+            ) {
 
-               $warnings[] = __("Technician assigned is mandatory before ticket is solved/closed",
-                                'behaviors');
+               $warnings[] = __(
+                  "Technician assigned is mandatory before ticket is solved/closed",
+                  'behaviors'
+               );
             }
          }
 
          if ($config->getField('is_tickettechgroup_mandatory')) {
             if (($obj->countGroups(CommonITILActor::ASSIGN) == 0)) {
-               $warnings[] = __("Group of technicians assigned is mandatory before ticket is solved/closed",
-                                'behaviors');
+               $warnings[] = __(
+                  "Group of technicians assigned is mandatory before ticket is solved/closed",
+                  'behaviors'
+               );
             }
          }
          if ($config->getField('is_knowbaseincident_mandatory') && $obj->fields['type'] == Ticket::INCIDENT_TYPE) {
@@ -305,8 +355,10 @@ class PluginBehaviorsCommon extends CommonGLPI {
          }
 
          if ($config->getField('is_tickettasktodo')) {
-            foreach ($DB->request('glpi_tickettasks',
-                                 ['tickets_id' => $obj->getField('id')]) as $task) {
+            foreach ($DB->request(
+               'glpi_tickettasks',
+               ['tickets_id' => $obj->getField('id')]
+            ) as $task) {
                if ($task['state'] == 1) {
                   $warnings[] = __("You cannot solve/close a ticket with task do to", 'behaviors');
                   break;
@@ -317,8 +369,10 @@ class PluginBehaviorsCommon extends CommonGLPI {
 
       if ($obj->getType() == 'Problem') {
          if ($config->getField('is_problemtasktodo')) {
-            foreach ($DB->request('glpi_problemtasks',
-                                 ['problems_id' => $obj->getField('id')]) as $task) {
+            foreach ($DB->request(
+               'glpi_problemtasks',
+               ['problems_id' => $obj->getField('id')]
+            ) as $task) {
                if ($task['state'] == 1) {
                   $warnings[] = __("You cannot solve/close a problem with task do to", 'behaviors');
                   break;
@@ -329,8 +383,10 @@ class PluginBehaviorsCommon extends CommonGLPI {
 
       if ($obj->getType() == 'Change') {
          if ($config->getField('is_changetasktodo')) {
-            foreach ($DB->request('glpi_changetasks',
-                                 ['changes_id' => $obj->getField('id')]) as $task) {
+            foreach ($DB->request(
+               'glpi_changetasks',
+               ['changes_id' => $obj->getField('id')]
+            ) as $task) {
                if ($task['state'] == 1) {
                   $warnings[] = __("You cannot solve/close a change with task do to", 'behaviors');
                   break;
@@ -346,8 +402,9 @@ class PluginBehaviorsCommon extends CommonGLPI {
     * Displaying message solution
     *
     * @param $params
-   **/
-   static function messageWarning($params) {
+    **/
+   static function messageWarning($params)
+   {
 
       if (isset($params['item'])) {
          $item = $params['item'];
@@ -385,8 +442,10 @@ class PluginBehaviorsCommon extends CommonGLPI {
                echo "</div>";
 
                echo "<div>";
-               echo "<h4 class='alert-title'>" . __("Task category is mandatory in a task",
-                                                    'behaviors') . "</h4>";
+               echo "<h4 class='alert-title'>" . __(
+                  "Task category is mandatory in a task",
+                  'behaviors'
+               ) . "</h4>";
                echo "</div>";
 
                echo "</div>";
@@ -404,8 +463,9 @@ class PluginBehaviorsCommon extends CommonGLPI {
     * @param $params
     *
     * @return array
-   **/
-   static function deleteAddSolutionButton($params) {
+    **/
+   static function deleteAddSolutionButton($params)
+   {
 
       if (isset($params['item'])) {
          $item = $params['item'];
@@ -418,5 +478,74 @@ class PluginBehaviorsCommon extends CommonGLPI {
             }
          }
       }
+   }
+
+   public static function hookPreShowTab(array $options)
+   {
+
+      if ($options['item']->getType() == Ticket::getType() && $options['options']['tabnum'] == "3") {
+         $type = [CommonITILActor::ASSIGN, CommonITILActor::OBSERVER];
+         $config = PluginBehaviorsConfig::getInstance();
+
+         $tu = new Ticket_User();
+         $existing_users = $tu->find(['tickets_id' => $options['item']->fields['id'], 'type' => $type, 'users_id' => Session::getLoginUserID(false)]);
+
+         $tech_exists = self::techExists($existing_users);
+         $observer_exists = self::observerExists($existing_users);
+         if ($config->getField('is_satisfaction_hide_tech') && $tech_exists) {
+            self::addCssSatisfaction();
+         }
+
+         if ($config->getField('is_satisfaction_hide_obsever') && $observer_exists) {
+            self::addCssSatisfaction();
+         }
+
+      }
+   }
+
+   static function addCssSatisfaction()
+   {
+      echo Html::scriptBlock("$(document).ready(function(){
+         $('.tab_cadre_fixe').hide();
+         $('.asset').hide();
+           });");
+      echo "<div class='alert alert-warning'>";
+
+      echo "<div class='d-flex'>";
+
+      echo "<div class='me-2'>";
+      echo "<i class='fa fa-exclamation-triangle fa-2x'></i>";
+      echo "</div>";
+
+      echo "<div>";
+      echo "<h4 class='alert-title'>" . __(
+         "You do not have permission. Consult your system administrator",
+         'behaviors'
+      ) . "</h4>";
+      echo "</div>";
+
+      echo "</div>";
+
+      echo "</div>";
+      return;
+
+   }
+
+   static function techExists($data)
+   {
+      $tech_exists = array_filter($data, function ($item) {
+
+         return $item['type'] == 2;
+      });
+      return $tech_exists;
+   }
+   static function observerExists($data)
+   {
+      $observer_exists = array_filter($data, function ($item) {
+
+         return $item['type'] == 3;
+      });
+
+      return $observer_exists;
    }
 }

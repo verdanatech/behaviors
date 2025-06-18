@@ -492,10 +492,9 @@ class PluginBehaviorsTicket {
       }
 
       $config = PluginBehaviorsConfig::getInstance();
-
       if ($config->getField('use_assign_user_group')
           && isset($ticket->input['_users_id_assign'])
-          && ($ticket->input['_users_id_assign'] > 0)
+          && (count($ticket->input['_users_id_assign']) > 0)
           && (!isset($ticket->input['_groups_id_assign'])
               || ($ticket->input['_groups_id_assign'] <= 0))) {
 

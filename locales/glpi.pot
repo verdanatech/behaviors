@@ -268,12 +268,23 @@ msgid "You cannot change status of a task in a solved ticket"
 msgstr ""
 
 
-#: inc/config.class.php:452
+#: inc/config.class.php:549
 msgid "Knowbase Item is mandatory before request is solved/closed"
 msgstr ""
 
 
-#: inc/config.class.php:458
+#: inc/config.class.php:555
 msgid "Knowbase Item is mandatory before incident is solved/closed"
 msgstr ""
 
+#: inc/config.class.php:566
+msgid "Hide satisfaction survey for ticket observer"
+msgstr ""
+
+#: inc/config.class.php:572
+msgid "Hide satisfaction survey for ticket technician"
+msgstr ""
+
+#: inc/commom.class.php:506
+msgid "You do not have permission. Consult your system administrator"
+msgstr ""

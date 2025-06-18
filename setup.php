@@ -30,62 +30,69 @@
 
  --------------------------------------------------------------------------
  */
+use Glpi\Plugin\Hooks;
 
 // Init the hooks of the plugins -Needed
-function plugin_init_behaviors() {
+function plugin_init_behaviors()
+{
    global $PLUGIN_HOOKS, $CFG_GLPI;
 
    Plugin::registerClass('PluginBehaviorsConfig', ['addtabon' => 'Config']);
    $PLUGIN_HOOKS['config_page']['behaviors'] = 'front/config.form.php';
 
    $PLUGIN_HOOKS['item_add']['behaviors'] =
-      ['Ticket_User'        => ['PluginBehaviorsTicket_User',       'afterAdd'],
-       'Group_Ticket'       => ['PluginBehaviorsGroup_Ticket',      'afterAdd'],
-       'Supplier_Ticket'    => ['PluginBehaviorsSupplier_Ticket',   'afterAdd'],
-       'Document_Item'      => ['PluginBehaviorsDocument_Item',     'afterAdd'],
-       'ITILFollowup'       => ['PluginBehaviorsITILFollowup',      'alterAdd']];
+      [
+         'Ticket_User' => ['PluginBehaviorsTicket_User', 'afterAdd'],
+         'Group_Ticket' => ['PluginBehaviorsGroup_Ticket', 'afterAdd'],
+         'Supplier_Ticket' => ['PluginBehaviorsSupplier_Ticket', 'afterAdd'],
+         'Document_Item' => ['PluginBehaviorsDocument_Item', 'afterAdd'],
+         'ITILFollowup' => ['PluginBehaviorsITILFollowup', 'alterAdd']
+      ];
 
    $PLUGIN_HOOKS['item_update']['behaviors'] =
-      ['Ticket'             => ['PluginBehaviorsTicket',            'afterUpdate']];
+      ['Ticket' => ['PluginBehaviorsTicket', 'afterUpdate']];
 
    $PLUGIN_HOOKS['pre_item_add']['behaviors'] =
-      ['Ticket'             => ['PluginBehaviorsTicket',            'beforeAdd'],
-       'ITILSolution'       => ['PluginBehaviorsITILSolution',      'beforeAdd'],
-       'TicketTask'         => ['PluginBehaviorsTickettask',        'beforeAdd'],
-       'Change'             => ['PluginBehaviorsChange',            'beforeAdd'],
-       'ITILFollowup'       => ['PluginBehaviorsITILFollowup',      'beforeAdd']];
+      [
+         'Ticket' => ['PluginBehaviorsTicket', 'beforeAdd'],
+         'ITILSolution' => ['PluginBehaviorsITILSolution', 'beforeAdd'],
+         'TicketTask' => ['PluginBehaviorsTickettask', 'beforeAdd'],
+         'Change' => ['PluginBehaviorsChange', 'beforeAdd'],
+         'ITILFollowup' => ['PluginBehaviorsITILFollowup', 'beforeAdd']
+      ];
 
    $PLUGIN_HOOKS['post_prepareadd']['behaviors'] =
-      ['Ticket'             => ['PluginBehaviorsTicket',            'afterPrepareAdd']];
+      ['Ticket' => ['PluginBehaviorsTicket', 'afterPrepareAdd']];
 
    $PLUGIN_HOOKS['pre_item_update']['behaviors'] =
-      ['Problem'            => ['PluginBehaviorsProblem',           'beforeUpdate'],
-       'Ticket'             => ['PluginBehaviorsTicket',            'beforeUpdate'],
-       'Change'             => ['PluginBehaviorsChange',            'beforeUpdate'],
-       'ITILSolution'       => ['PluginBehaviorsITILSolution',      'beforeUpdate'],
-       'TicketTask'         => ['PluginBehaviorsTickettask',        'beforeUpdate'],
-       'ChangeTask'         => ['PluginBehaviorsChangetask',        'beforeUpdate'],
-       'ProblemTask'        => ['PluginBehaviorsProblemtask',       'beforeUpdate'],
-       'ProblemTask'        => ['PluginBehaviorsProblemtask',       'beforeUpdate'],
-       'ProjectTask'        => ['PluginBehaviorsProjectTask',       'beforeUpdate'],
-       'Project'        => ['PluginBehaviorsProject',       'beforeUpdate']];
+      [
+         'Problem' => ['PluginBehaviorsProblem', 'beforeUpdate'],
+         'Ticket' => ['PluginBehaviorsTicket', 'beforeUpdate'],
+         'Change' => ['PluginBehaviorsChange', 'beforeUpdate'],
+         'ITILSolution' => ['PluginBehaviorsITILSolution', 'beforeUpdate'],
+         'TicketTask' => ['PluginBehaviorsTickettask', 'beforeUpdate'],
+         'ChangeTask' => ['PluginBehaviorsChangetask', 'beforeUpdate'],
+         'ProblemTask' => ['PluginBehaviorsProblemtask', 'beforeUpdate'],
+         'ProjectTask' => ['PluginBehaviorsProjectTask', 'beforeUpdate'],
+         'Project'=> ['PluginBehaviorsProject', 'beforeUpdate']];
 
    $PLUGIN_HOOKS['pre_item_purge']['behaviors'] =
-      ['Computer'           => ['PluginBehaviorsComputer',          'beforePurge']];
+      ['Computer' => ['PluginBehaviorsComputer', 'beforePurge']];
 
    $PLUGIN_HOOKS['item_purge']['behaviors'] =
-      ['Document_Item'      => ['PluginBehaviorsDocument_Item',     'afterPurge']];
+      ['Document_Item' => ['PluginBehaviorsDocument_Item', 'afterPurge']];
 
    // Notifications
    $PLUGIN_HOOKS['item_get_events']['behaviors'] =
-      ['NotificationTargetTicket' => ['PluginBehaviorsTicket',      'addEvents']];
+      ['NotificationTargetTicket' => ['PluginBehaviorsTicket', 'addEvents']];
 
    $PLUGIN_HOOKS['item_add_targets']['behaviors'] =
-      ['NotificationTargetTicket' => ['PluginBehaviorsTicket',      'addTargets']];
+      ['NotificationTargetTicket' => ['PluginBehaviorsTicket', 'addTargets']];
 
    $PLUGIN_HOOKS['item_action_targets']['behaviors'] =
-      ['NotificationTargetTicket' => ['PluginBehaviorsTicket',      'addActionTargets']];
+      ['NotificationTargetTicket' => ['PluginBehaviorsTicket', 'addActionTargets']];
 
+   $PLUGIN_HOOKS['pre_show_tab']['behaviors'] =   [PluginBehaviorsCommon::class, 'hookPreShowTab'];
    $PLUGIN_HOOKS['pre_item_form']['behaviors'] = [PluginBehaviorsCommon::class, 'messageWarning'];
    $PLUGIN_HOOKS['post_item_form']['behaviors'] = [PluginBehaviorsCommon::class, 'deleteAddSolutionButton'];
 
@@ -103,20 +110,28 @@ function plugin_init_behaviors() {
 }
 
 
-function plugin_version_behaviors() {
+function plugin_version_behaviors()
+{
 
-   return ['name'           => __('Behaviours', 'behaviors'),
-           'version'        => '2.7.3.1',
-           'license'        => 'AGPLv3+',
-           'author'         => 'Remi Collet, Nelly Mahu-Lasson',
-           'homepage'       => 'https://github.com/yllen/behaviors',
-           'minGlpiVersion' => '10.0.5',
-           'requirements'   => ['glpi' => ['min' => '10.0.5',
-                                           'max' => '10.1.0']]];
+   return [
+      'name' => __('Behaviours', 'behaviors'),
+      'version' => '2.7.3.2',
+      'license' => 'AGPLv3+',
+      'author' => 'Remi Collet, Nelly Mahu-Lasson',
+      'homepage' => 'https://github.com/yllen/behaviors',
+      'minGlpiVersion' => '10.0.5',
+      'requirements' => [
+         'glpi' => [
+            'min' => '10.0.5',
+            'max' => '10.1.0'
+         ]
+      ]
+   ];
 }
 
 // Check configuration process for plugin : need to return true if succeeded
 // Can display a message only if failure and $verbose is true
-function plugin_behaviors_check_config($verbose=false) {
+function plugin_behaviors_check_config($verbose = false)
+{
    return true;
 }
