@@ -53,7 +53,6 @@ class PluginBehaviorsUser {
                                  $where]];
 
       $rep = [];
-      var_dump($DB->request($query));exit;
       foreach ($DB->request($query) as $data) {
          if ($first) {
             return $data['id'];
