@@ -453,6 +453,18 @@ class PluginBehaviorsCommon extends CommonGLPI
                echo "</div>";
             }
          }
+          else if ($item->getType() == 'TicketSatisfaction') {
+            $type = [CommonITILActor::ASSIGN, CommonITILActor::OBSERVER];
+            $config = PluginBehaviorsConfig::getInstance();
+            $tu = new Ticket_User();
+            $existing_users = $tu->find(['tickets_id' => $item->fields['tickets_id'], 'type' => $type, 'users_id' => Session::getLoginUserID(false)]);
+
+            $observer_exists = self::observerExists($existing_users);
+            if ($config->getField('is_satisfaction_hide_tech') && $observer_exists) {
+               self::addCssSatisfaction();
+            }
+   
+         }
       }
    }
 

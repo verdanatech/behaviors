@@ -117,7 +117,7 @@ function plugin_version_behaviors()
       'name' => __('Behaviours', 'behaviors'),
       'version' => '2.7.3.2',
       'license' => 'AGPLv3+',
-      'author' => 'Remi Collet, Nelly Mahu-Lasson',
+      'author' => 'Verdanatech,Remi Collet, Nelly Mahu-Lasson',
       'homepage' => 'https://github.com/yllen/behaviors',
       'minGlpiVersion' => '10.0.5',
       'requirements' => [
