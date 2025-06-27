@@ -1,37 +1,37 @@
 <?php
 /**
- -------------------------------------------------------------------------
-
- LICENSE
-
- This file is part of Behaviors plugin for GLPI.
-
- Behaviors is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- Behaviors is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with Behaviors. If not, see <http://www.gnu.org/licenses/>.
-
- @package   behaviors
- @author    Remi Collet, Nelly Mahu-Lasson
- @copyright Copyright (c) 2010-2023 Behaviors plugin team
- @license   AGPL License 3.0 or (at your option) any later version
-            http://www.gnu.org/licenses/agpl-3.0-standalone.html
- @link      https://forge.glpi-project.org/projects/behaviors
- @link      http://www.glpi-project.org/
- @since     2010
-
- --------------------------------------------------------------------------
+ * -------------------------------------------------------------------------
+ *
+ * LICENSE
+ *
+ * This file is part of Behaviors plugin for GLPI.
+ *
+ * Behaviors is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Behaviors is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Behaviors. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package   behaviors
+ * @author    Verdanatech, Infotel, Remi Collet, Nelly Mahu-Lasson
+ * @copyright Copyright (c) 2018-2025 Behaviors plugin team
+ * @license   AGPL License 3.0 or (at your option) any later version
+ * http://www.gnu.org/licenses/agpl-3.0-standalone.html
+ * @link      https://github.com/InfotelGLPI/behaviors/
+ * @link      http://www.glpi-project.org/
+ * @since     2010
+ *
+ * --------------------------------------------------------------------------
  */
-use Glpi\Plugin\Hooks;
 
+define('PLUGIN_BEHAVIORS_VERSION', '2.7.6');
 // Init the hooks of the plugins -Needed
 function plugin_init_behaviors()
 {
@@ -46,7 +46,7 @@ function plugin_init_behaviors()
          'Group_Ticket' => ['PluginBehaviorsGroup_Ticket', 'afterAdd'],
          'Supplier_Ticket' => ['PluginBehaviorsSupplier_Ticket', 'afterAdd'],
          'Document_Item' => ['PluginBehaviorsDocument_Item', 'afterAdd'],
-         'ITILFollowup' => ['PluginBehaviorsITILFollowup', 'alterAdd']
+         'ITILSolution' => ['PluginBehaviorsITILSolution', 'afterAdd']
       ];
 
    $PLUGIN_HOOKS['item_update']['behaviors'] =
@@ -74,7 +74,8 @@ function plugin_init_behaviors()
          'ChangeTask' => ['PluginBehaviorsChangetask', 'beforeUpdate'],
          'ProblemTask' => ['PluginBehaviorsProblemtask', 'beforeUpdate'],
          'ProjectTask' => ['PluginBehaviorsProjectTask', 'beforeUpdate'],
-         'Project'=> ['PluginBehaviorsProject', 'beforeUpdate']];
+         'Project' => ['PluginBehaviorsProject', 'beforeUpdate']
+      ];
 
    $PLUGIN_HOOKS['pre_item_purge']['behaviors'] =
       ['Computer' => ['PluginBehaviorsComputer', 'beforePurge']];
@@ -92,41 +93,41 @@ function plugin_init_behaviors()
    $PLUGIN_HOOKS['item_action_targets']['behaviors'] =
       ['NotificationTargetTicket' => ['PluginBehaviorsTicket', 'addActionTargets']];
 
-   $PLUGIN_HOOKS['pre_show_tab']['behaviors'] =   [PluginBehaviorsCommon::class, 'hookPreShowTab'];
+   $PLUGIN_HOOKS['pre_show_tab']['behaviors'] = [PluginBehaviorsCommon::class, 'hookPreShowTab'];
    $PLUGIN_HOOKS['pre_item_form']['behaviors'] = [PluginBehaviorsCommon::class, 'messageWarning'];
    $PLUGIN_HOOKS['post_item_form']['behaviors'] = [PluginBehaviorsCommon::class, 'deleteAddSolutionButton'];
 
-   // End init, when all types are registered
-   $PLUGIN_HOOKS['post_init']['behaviors'] = ['PluginBehaviorsCommon', 'postInit'];
+    // End init, when all types are registered
+    $PLUGIN_HOOKS['post_init']['behaviors'] = ['PluginBehaviorsCommon', 'postInit'];
 
-   $PLUGIN_HOOKS['csrf_compliant']['behaviors'] = true;
+    $PLUGIN_HOOKS['csrf_compliant']['behaviors'] = true;
 
-   foreach ($CFG_GLPI["asset_types"] as $type) {
-      $PLUGIN_HOOKS['item_can']['behaviors'][$type] = [$type => ['PluginBehaviorsConfig', 'item_can']];
-   }
+    //TO Disable in v11
+    foreach ($CFG_GLPI["asset_types"] as $type) {
+        $PLUGIN_HOOKS['item_can']['behaviors'][$type] = [$type => ['PluginBehaviorsConfig', 'item_can']];
+    }
 
-   $PLUGIN_HOOKS['add_default_where']['behaviors'] = ['PluginBehaviorsConfig', 'add_default_where'];
-
+    //TO Disable in v11
+    $PLUGIN_HOOKS['add_default_where']['behaviors'] = ['PluginBehaviorsConfig', 'add_default_where'];
 }
 
 
 function plugin_version_behaviors()
 {
-
-   return [
-      'name' => __('Behaviours', 'behaviors'),
-      'version' => '2.7.3.2',
-      'license' => 'AGPLv3+',
-      'author' => 'Verdanatech,Remi Collet, Nelly Mahu-Lasson',
-      'homepage' => 'https://github.com/yllen/behaviors',
-      'minGlpiVersion' => '10.0.5',
-      'requirements' => [
-         'glpi' => [
-            'min' => '10.0.5',
-            'max' => '10.1.0'
-         ]
-      ]
-   ];
+    return [
+        'name' => __('Behaviours', 'behaviors'),
+        'version' => PLUGIN_BEHAVIORS_VERSION,
+        'license' => 'AGPLv3+',
+        'author' => 'Verdanatech, Infotel, Remi Collet, Nelly Mahu-Lasson',
+        'homepage' => 'https://github.com/InfotelGLPI/behaviors',
+        'minGlpiVersion' => '10.0.5',
+        'requirements' => [
+            'glpi' => [
+                'min' => '10.0.5',
+                'max' => '11.0.0'
+            ]
+        ]
+    ];
 }
 
 // Check configuration process for plugin : need to return true if succeeded
