@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: GLPI Project - Plugin Behaviors\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-06-09 15:00+0200\n"
-"PO-Revision-Date: 2025-06-17 13:47-0300\n"
+"PO-Revision-Date: 2025-06-27 09:39-0300\n"
 "Last-Translator: Diego Nobre <diego@koruma.com.br>, 2019,2021-2023\n"
 "Language-Team: Portuguese (Brazil) (http://app.transifex.com/yllen/glpi-project-plugin-behaviors/language/pt_BR/)\n"
 "Language: pt_BR\n"
@@ -84,6 +84,10 @@ msgstr "Mostrar ativos dos meus grupos"
 #: inc/config.class.php:281 inc/config.class.php:374
 msgid "Use the technician's group"
 msgstr "Use o grupo do técnico"
+
+#: inc/common.class.php:415
+msgid "You must add a description. it's mandatory"
+msgstr "Você deve adicionar uma descrição. é obrigatório"
 
 #: inc/config.class.php:284
 msgid "Notification"
