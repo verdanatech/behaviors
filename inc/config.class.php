@@ -571,6 +571,7 @@ class PluginBehaviorsConfig extends CommonDBTM
             "is_ticketrealtime_mandatory",
             $config->fields['is_ticketrealtime_mandatory']
         );
+        echo "<tr class='tab_bg_1'>";
 	
 	  echo "<td>" . __('Knowbase Item is mandatory before request is solved/closed', 'behaviors');
       echo "</td><td>";
@@ -603,13 +604,7 @@ class PluginBehaviorsConfig extends CommonDBTM
 
       echo "</td></tr>\n";
 
-      echo "<tr class='tab_bg_1'>";
-      echo "<th colspan='2'></th>";
-      echo "<th colspan='2'>" . sprintf(
-         __('%1$s %2$s'),
-         __('Last update'),
-         Html::convDateTime($config->fields["date_mod"])
-      );
+      
       echo "</td></tr>";
         echo "</td>";
         echo "<td colspan='2'></td></tr>";
