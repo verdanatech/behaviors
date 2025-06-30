@@ -512,8 +512,68 @@ class PluginBehaviorsConfig extends CommonDBTM
         ]);
         echo "</td></tr>";
 
-      echo "<tr class='tab_bg_1'>";
-      echo "<td>" . __('Knowbase Item is mandatory before request is solved/closed', 'behaviors');
+        echo "<tr class='tab_bg_1'>";
+        echo "<td>" . __('Category is mandatory before ticket is solved/closed', 'behaviors') . "</td><td>";
+        Dropdown::showYesNo(
+            "is_ticketcategory_mandatory",
+            $config->fields['is_ticketcategory_mandatory']
+        );
+        echo "</td>";
+        echo "</tr>";
+
+        echo "<tr class='tab_bg_1'>";
+        echo "<td>" . __('Location is mandatory before ticket is solved/closed', 'behaviors');
+        echo "</td><td>";
+        Dropdown::showYesNo(
+            "is_ticketlocation_mandatory",
+            $config->fields['is_ticketlocation_mandatory']
+        );
+        echo "</td>";
+        echo "</tr>";
+
+
+        echo "<tr class='tab_bg_1'>";
+        echo "<td>" . __(
+                'Description of solution is mandatory before ticket is solved/closed',
+                'behaviors'
+            );
+        echo "</td>";
+        echo "<td>";
+        Dropdown::showYesNo(
+            "is_ticketsolution_mandatory",
+            $config->fields['is_ticketsolution_mandatory']
+        );
+        echo "</td>";
+        echo "<td colspan='2'></td></tr>";
+
+
+        echo "<tr class='tab_bg_1'>";
+        echo "<td>" . __('Type of solution is mandatory before ticket is solved/closed', 'behaviors');
+        echo "</td><td>";
+        Dropdown::showYesNo(
+            "is_ticketsolutiontype_mandatory",
+            $config->fields['is_ticketsolutiontype_mandatory']
+        );
+        echo "</td>";
+
+        echo "<td colspan='2'></td></tr>";
+
+        echo "<tr class='tab_bg_1'>";
+        echo "<td>" . __('Block the solving/closing of a the ticket if task do to', 'behaviors');
+        echo "</td><td>";
+        Dropdown::showYesNo("is_tickettasktodo", $config->fields['is_tickettasktodo']);
+        echo "</td>";
+        echo "<td colspan='2'></td></tr>";
+
+        echo "<tr class='tab_bg_1'>";
+        echo "<td>" . __('Duration is mandatory before ticket is solved/closed', 'behaviors') . "</td><td>";
+        Dropdown::showYesNo(
+            "is_ticketrealtime_mandatory",
+            $config->fields['is_ticketrealtime_mandatory']
+        );
+        echo "<tr class='tab_bg_1'>";
+	
+	  echo "<td>" . __('Knowbase Item is mandatory before request is solved/closed', 'behaviors');
       echo "</td><td>";
       Dropdown::showYesNo("is_knowbaserequest_mandatory", $config->fields['is_knowbaserequest_mandatory']);
       echo "</td><td colspan='2'></td></tr>";
@@ -544,170 +604,160 @@ class PluginBehaviorsConfig extends CommonDBTM
 
       echo "</td></tr>\n";
 
-      echo "<tr class='tab_bg_1'>";
-      echo "<th colspan='2'></th>";
-      echo "<th colspan='2'>" . sprintf(
-         __('%1$s %2$s'),
-         __('Last update'),
-         Html::convDateTime($config->fields["date_mod"])
-      );
+      
       echo "</td></tr>";
+        echo "</td>";
+        echo "<td colspan='2'></td></tr>";
+
+        echo "<tr class='tab_bg_1'>";
+        echo "<th colspan='2'></th>";
+        echo "<th colspan='2'>" . sprintf(
+                __('%1$s %2$s'),
+                __('Last update'),
+                Html::convDateTime($config->fields["date_mod"])
+            );
+        echo "</td></tr>";
+
+        $config->showFormButtons(['formfooter' => true, 'candel' => false]);
+
+        return false;
+    }
 
 
+    function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
+    {
+        if ($item->getType() == 'Config') {
+            return self::getName();
+        }
+        return '';
+    }
 
 
-
-      $config->showFormButtons(['formfooter' => true, 'candel' => false]);
-
-      return false;
-   }
-
-
-   function getTabNameForItem(CommonGLPI $item, $withtemplate = 0)
-   {
-
-      if ($item->getType() == 'Config') {
-         return self::getName();
-      }
-      return '';
-   }
+    static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
+    {
+        if ($item->getType() == 'Config') {
+            self::showConfigForm($item);
+        }
+        return true;
+    }
 
 
-   static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0)
-   {
+    /**
+     * Restrict visibility rights
+     *
+     * @param  $item
+     **@since 1.5.0
+     *
+     */
+    static function item_can($item)
+    {
+        global $DB, $CFG_GLPI;
 
-      if ($item->getType() == 'Config') {
-         self::showConfigForm($item);
-      }
-      return true;
-   }
-
-
-   /**
-    * Restrict visibility rights
-    *
-    * @since 1.5.0
-    *
-    * @param  $item
-    **/
-   static function item_can($item)
-   {
-      global $DB, $CFG_GLPI;
-
-      $itemtype = $item->getType();
-      if (
-         in_array($item->getType(), $CFG_GLPI["asset_types"])
-         && !Session::haveRight($itemtype::$rightname, UPDATE)
-      ) {
-
-         $config = PluginBehaviorsConfig::getInstance();
-         if (
-            $config->getField('myasset')
-            && ($item->fields['users_id'] > 0)
-            && ($item->fields['users_id'] <> Session::getLoginUserID())
-         ) {
-
-            if (
-               $config->getField('groupasset')
-               && ($item->fields['groups_id'] > 0)
-               && !in_array($item->fields['groups_id'], $_SESSION["glpigroups"])
-            ) {
-               $item->right = '0';
+        $itemtype = $item->getType();
+        if (in_array($item->getType(), $CFG_GLPI["asset_types"])
+            && !Session::haveRight($itemtype::$rightname, UPDATE)) {
+            $config = PluginBehaviorsConfig::getInstance();
+            if ($config->getField('myasset')
+                && ($item->fields['users_id'] > 0)
+                && ($item->fields['users_id'] <> Session::getLoginUserID())) {
+                if ($config->getField('groupasset')
+                    && ($item->fields['groups_id'] > 0)
+                    && !in_array($item->fields['groups_id'], $_SESSION["glpigroups"])) {
+                    $item->right = '0';
+                }
             }
-         }
-         if (
-            $config->getField('groupasset')
-            && ($item->fields['groups_id'] > 0)
-            && !in_array($item->fields['groups_id'], $_SESSION["glpigroups"])
-         ) {
-
-            if (
-               $config->getField('myasset')
-               && ($item->fields['users_id'] > 0)
-               && ($item->fields['users_id'] <> Session::getLoginUserID())
-            ) {
-               $item->right = '0';
+            if ($config->getField('groupasset')
+                && ($item->fields['groups_id'] > 0)
+                && !in_array($item->fields['groups_id'], $_SESSION["glpigroups"])) {
+                if ($config->getField('myasset')
+                    && ($item->fields['users_id'] > 0)
+                    && ($item->fields['users_id'] <> Session::getLoginUserID())) {
+                    $item->right = '0';
+                }
             }
-         }
-      }
-   }
+        }
+    }
 
 
-   /**
-    * Restrict visibility rights
-    *
-    * @since 1.5.0
-    *
-    * @param  $item
-    **/
-   static function add_default_where($item)
-   {
-      global $DB, $CFG_GLPI;
-      ;
+    public function post_updateItem($history = 1)
+    {
+        $updates = $this->updates;
+        if (($key = array_search('date_mod', $updates)) !== false) {
+            unset($updates[$key]);
+        }
 
-      $condition = "";
-      list($itemtype, $condition) = $item;
+        foreach ($updates as $update) {
+            if (isset($this->fields[$update])) {
+                $oldvalue = $this->oldvalues[$update];
+                $newvalue = $this->fields[$update];
 
-      if (isCommandLine()) {
-         return [$itemtype, $condition];
-      }
-
-      $dbu = new DbUtils();
-
-      $config = PluginBehaviorsConfig::getInstance();
-      if (
-         in_array($itemtype, $CFG_GLPI["asset_types"])
-         && !Session::haveRight($itemtype::$rightname, UPDATE)
-      ) {
-
-         $dbu = new DbUtils();
-         $table = $dbu->getTableForItemType($itemtype);
-         if ($config->getField('myasset')) {
-            $condition .= "(`" . $table . "`.`users_id` = " . Session::getLoginUserID() . ")";
-            if (
-               $config->getField('groupasset')
-               && count($_SESSION["glpigroups"])
-            ) {
-               $condition .= " OR ";
+                $configGLPI = new Config();
+                Log::constructHistory($configGLPI, ['value' => $update.' '.$oldvalue], ['value' => $update.' '.$newvalue]);
             }
-         }
-         if (
-            $config->getField('groupasset')
-            && count($_SESSION["glpigroups"])
-         ) {
-            $condition .= " (`" . $table . "`.`groups_id` IN ('" . implode("','", $_SESSION["glpigroups"]) . "'))";
-         }
-      }
+        }
+    }
 
-      $filtre = [];
-      if ($itemtype == 'AllAssets') {
-         foreach ($CFG_GLPI[$CFG_GLPI["union_search_type"][$itemtype]] as $ctype) {
-            if (
-               ($citem = $dbu->getItemForItemtype($ctype))
-               && !$citem->canUpdate()
-            ) {
-               $filtre[$ctype] = $ctype;
-            }
-         }
+    /**
+     * Restrict visibility rights
+     *
+     * @param  $item
+     **@since 1.5.0
+     *
+     */
+    static function add_default_where($item)
+    {
+        global $CFG_GLPI;;
 
-         if (count($filtre)) {
+        $condition = "";
+        list($itemtype, $condition) = $item;
+
+        if (isCommandLine()) {
+            return [$itemtype, $condition];
+        }
+
+        $dbu = new DbUtils();
+
+        $config = PluginBehaviorsConfig::getInstance();
+        if (in_array($itemtype, $CFG_GLPI["asset_types"])
+            && !Session::haveRight($itemtype::$rightname, UPDATE)) {
+            $dbu = new DbUtils();
+            $table = $dbu->getTableForItemType($itemtype);
             if ($config->getField('myasset')) {
-               $condition .= " (`asset_types`.`users_id` = " . Session::getLoginUserID() . ")";
-               if (
-                  $config->getField('groupasset')
-                  && count($_SESSION["glpigroups"])
-               ) {
-                  $condition .= " OR ";
-               }
+                $condition .= "(`" . $table . "`.`users_id` = " . Session::getLoginUserID() . ")";
+                if ($config->getField('groupasset')
+                    && count($_SESSION["glpigroups"])) {
+                    $condition .= " OR ";
+                }
             }
-            if (
-               $config->getField('groupasset')
-               && count($_SESSION["glpigroups"])
-            ) {
-               $condition .= " (`asset_types`.`groups_id` IN ('" . implode("','", $_SESSION["glpigroups"]) . "'))";
+            if ($config->getField('groupasset')
+                && count($_SESSION["glpigroups"])) {
+                $condition .= " (`" . $table . "`.`groups_id` IN ('" . implode("','", $_SESSION["glpigroups"]) . "'))";
             }
-         }
-      }
-      return [$itemtype, $condition];
-   }
+        }
+
+        $filtre = [];
+        if ($itemtype == 'AllAssets') {
+            foreach ($CFG_GLPI[$CFG_GLPI["union_search_type"][$itemtype]] as $ctype) {
+                if (($citem = $dbu->getItemForItemtype($ctype))
+                    && !$citem->canUpdate()) {
+                    $filtre[$ctype] = $ctype;
+                }
+            }
+
+            if (count($filtre)) {
+                if ($config->getField('myasset')) {
+                    $condition .= " (`asset_types`.`users_id` = " . Session::getLoginUserID() . ")";
+                    if ($config->getField('groupasset')
+                        && count($_SESSION["glpigroups"])) {
+                        $condition .= " OR ";
+                    }
+                }
+                if ($config->getField('groupasset')
+                    && count($_SESSION["glpigroups"])) {
+                    $condition .= " (`asset_types`.`groups_id` IN ('" . implode("','", $_SESSION["glpigroups"]) . "'))";
+                }
+            }
+        }
+        return [$itemtype, $condition];
+    }
 }
