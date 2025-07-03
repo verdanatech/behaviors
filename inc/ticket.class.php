@@ -402,7 +402,7 @@ class PluginBehaviorsTicket
             if (!isset($ticket->input['_groups_id_requester'])
                 || $ticket->input['_groups_id_requester'] == 0) {
                 $requesters = self::useRequesterUserGroup($ticket->input);
-                if (isset($ticket->input['_actors']['requester'])) {
+                if (isset($ticket->input['_actors']['requester']) && count($ticket->input['_actors']['requester']) > 0) {
                     $ticket->input['_actors']['requester'] = array_merge(
                         $ticket->input['_actors']['requester'],
                         $requesters
