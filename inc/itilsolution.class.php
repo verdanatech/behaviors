@@ -104,7 +104,7 @@ class PluginBehaviorsITILSolution {
                                              'behaviors'), true, ERROR);
             return;
          }
-
+         
          $params = [
             'itemtype'         => 'Ticket',
             'items_id'         => $ticket->fields['id']
@@ -114,7 +114,7 @@ class PluginBehaviorsITILSolution {
             $params
         );
          if ($config->getField('is_knowbaseincident_mandatory') && $ticket->fields['type'] == Ticket::INCIDENT_TYPE) {
-            if ($existing->numrows() == 0) {
+            if ($existing->numrows() == 0 && empty($soluce->input['kb_linked_id'])) {
                   $soluce->input = false;
             Session::addMessageAfterRedirect(__("Kbowbase Item is mandatory before ticket is solved/closed",
                                              'behaviors'), true, ERROR);
@@ -122,7 +122,7 @@ class PluginBehaviorsITILSolution {
             }
          }
          if ($config->getField('is_knowbaserequest_mandatory') && $ticket->fields['type'] == Ticket::DEMAND_TYPE) {
-            if ($existing->numrows() == 0) {
+            if ($existing->numrows() == 0 && empty($soluce->input['kb_linked_id'])) {
                   $soluce->input = false;
             Session::addMessageAfterRedirect(__("Kbowbase Item is mandatory before ticket is solved/closed",
                                              'behaviors'), true, ERROR);
