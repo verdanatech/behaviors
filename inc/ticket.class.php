@@ -554,9 +554,9 @@ class PluginBehaviorsTicket
                 $actors_requester = $input['_actors']['requester'];
             }
 
-            if (isset($ticket->input['_mailgate']) && $ticket->input['_mailgate'] > 0) {
+            if (isset($ticket->input['_mailgate']) && $input['_mailgate'] > 0) {
                 if (isset($ticket->input['_users_id_requester_notif']['alternative_email'][0])) {
-                    $email = $ticket->input['_users_id_requester_notif']['alternative_email'][0];
+                    $email = $input['_users_id_requester_notif']['alternative_email'][0];
                     $condition = [
                         'glpi_users.is_active' => 1,
                         'glpi_users.is_deleted' => 0,
