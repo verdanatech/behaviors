@@ -552,8 +552,7 @@ class PluginBehaviorsCommon extends CommonGLPI
          if ($config->getField('is_satisfaction_hide_tech') && $tech_exists) {
             self::addCssSatisfaction();
          }
-
-         if ($config->getField('is_satisfaction_hide_obsever') && $observer_exists) {
+         if ($config->getField('is_satisfaction_hide_observer') && $observer_exists) {
             self::addCssSatisfaction();
          }
 
