@@ -118,6 +118,10 @@ class PluginBehaviorsConfig extends CommonDBTM
                      `is_changetasktodo` tinyint NOT NULL default '0',
                      `date_mod` timestamp NULL DEFAULT NULL,
                      `comment` text,
+                     `is_knowbaserequest_mandatory` tinyint NOT NULL default '0',
+                     `is_knowbaseincident_mandatory` tinyint NOT NULL default '0',
+                     `is_satisfaction_hide_observer` tinyint NOT NULL default '0',
+                     `is_satisfaction_hide_tech` tinyint NOT NULL default '0',
                      PRIMARY KEY  (`id`)
                    ) ENGINE=InnoDB  DEFAULT CHARSET = {$default_charset}
                      COLLATE = {$default_collation} ROW_FORMAT=DYNAMIC";
@@ -126,7 +130,7 @@ class PluginBehaviorsConfig extends CommonDBTM
                 __('Error in creating glpi_plugin_behaviors_configs', 'behaviors') .
                 "<br>" . $DB->error()
             );
-
+            
             $query = "INSERT INTO `$table`
                          (id, date_mod)
                    VALUES (1, NOW())";
