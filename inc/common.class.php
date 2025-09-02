@@ -541,14 +541,17 @@ class PluginBehaviorsCommon extends CommonGLPI
    {
 
       if ($options['item']->getType() == Ticket::getType() && $options['options']['tabnum'] == "3") {
-         $type = [CommonITILActor::ASSIGN, CommonITILActor::OBSERVER];
          $config = PluginBehaviorsConfig::getInstance();
 
          $tu = new Ticket_User();
-         $existing_users = $tu->find(['tickets_id' => $options['item']->fields['id'], 'type' => $type, 'users_id' => Session::getLoginUserID(false)]);
+         $existing_users = $tu->find(['tickets_id' => $options['item']->fields['id'], 'users_id' => Session::getLoginUserID(false)]);
 
-         $tech_exists = self::techExists($existing_users);
-         $observer_exists = self::observerExists($existing_users);
+         $requester_exists = self::userExists($existing_users, CommonITILActor::REQUESTER);
+         $tech_exists = self::userExists($existing_users, CommonITILActor::ASSIGN);
+         $observer_exists = self::userExists($existing_users, CommonITILActor::OBSERVER);
+         if ($requester_exists) {
+             return;
+         }
          if ($config->getField('is_satisfaction_hide_tech') && $tech_exists) {
             self::addCssSatisfaction();
          }
@@ -587,21 +590,12 @@ class PluginBehaviorsCommon extends CommonGLPI
 
    }
 
-   static function techExists($data)
+   static function userExists($data, $type)
    {
-      $tech_exists = array_filter($data, function ($item) {
+       $user_exists = array_filter($data, function ($item) use ($type) {
+           return $item['type'] == $type;
+       });
 
-         return $item['type'] == 2;
-      });
-      return $tech_exists;
-   }
-   static function observerExists($data)
-   {
-      $observer_exists = array_filter($data, function ($item) {
-
-         return $item['type'] == 3;
-      });
-
-      return $observer_exists;
+       return $user_exists;
    }
 }
