@@ -73,7 +73,7 @@ class PluginBehaviorsITILSolution
                 return;
             }
             if ($config->getField('is_ticketsolution_mandatory')
-                && empty($soluce->input['content'])) {
+                && empty($soluce->input['content']) && (!isset($soluce->input['_solutiontemplates_id']) || empty($soluce->input['_solutiontemplates_id']))) {
                 $soluce->input = false;
                 Session::addMessageAfterRedirect(
                     __(
