@@ -1051,8 +1051,13 @@ class PluginBehaviorsTicket
 //            if ($requesters !== null) {
 //                $ticket->input['_actors']['requester'] = self::removeDuplicates($requesters);
 //            }
-//        }
+// //        }
+// echo "<pre>";var_dump($ticket->input);exit;
 
+        if(isset($ticket->input['_itil_assign'])){
+            $ticket->input['_actors']['assign'] = self::prepairActorsPayload($ticket->input['_itil_assign']);
+
+        }
         if ($config->getField('use_assign_user_group_update')
             && isset($ticket->input['_actors']['assign'])) {
             $assigns = self::useAssignTechGroup($ticket->input, 'use_assign_user_group_update');
@@ -1431,5 +1436,52 @@ class PluginBehaviorsTicket
         foreach ($DB->request($query, '', true) as $data) {
             $target->addToRecipientsList($data);
         }
+
+       
+    }
+    public static function prepairActorsPayload($data)
+    {
+        $actors = array();
+        $fn_add_actor = static function (string $itemtype, int $items_id, array $params) use (&$actors) {
+            $already_added = !empty(array_filter($actors, static function ($actor) use ($itemtype, $items_id, $params) {
+                if ($actor['itemtype'] === $itemtype && (int) $actor['items_id'] === 0) {
+                    // Anonymous actors unique based on email
+                    return ($actor['alternative_email'] ?? null) === ($params['alternative_email'] ?? null);
+                }
+                return $actor['itemtype'] === $itemtype && (int) $actor['items_id'] === $items_id;
+            }));
+            if (!$already_added) {
+                $actors[] = [
+                    'itemtype' => $itemtype,
+                    'items_id' => $items_id,
+                ] + $params;
+            }
+        };
+
+    
+        if ($data['users_id'] > 0) {
+            $userobj  = new User();
+
+            if ($userobj->getFromDB($data['users_id'])) {
+
+                $name = formatUserName(
+                    $userobj->fields["id"],
+                    $userobj->fields["name"],
+                    $userobj->fields["realname"],
+                    $userobj->fields["firstname"]
+                );
+                $email = UserEmail::getDefaultForUser($data['users_id']);
+                $fn_add_actor('User', $data['users_id'], [
+                    'text'              => $name,
+                    'title'             => $name,
+                    'use_notification'  => $email === '' ? false : true,
+                    'default_email'     => $email,
+                    'alternative_email' => '',
+                ]);
+            }
+
+            
+        }
+        return $actors;
     }
 }
