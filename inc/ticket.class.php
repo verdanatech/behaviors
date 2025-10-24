@@ -1103,7 +1103,6 @@ class PluginBehaviorsTicket
                 $assigns = self::removeDuplicates($assigns);
             }
         }
-        // echo "<pre>";var_dump($ticket->input);exit;
 
         if (
             $config->getField('use_assign_user_group_update')
