@@ -227,9 +227,11 @@ class PluginBehaviorsTicket
                 $author_lang = $data["language"];
                 $author_id = $data['users_id'];
 
-                if (!empty($data['altemail'])
+                if (
+                    !empty($data['altemail'])
                     && ($data['altemail'] != $author_email)
-                    && NotificationMailing::isUserAddressValid($data['altemail'])) {
+                    && NotificationMailing::isUserAddressValid($data['altemail'])
+                ) {
                     $author_email = $data['altemail'];
                 }
                 if (empty($author_lang)) {
@@ -325,8 +327,10 @@ class PluginBehaviorsTicket
     {
         global $DB;
 
-        if (!$target->options['sendprivate']
-            && $target->obj->countSuppliers(CommonITILActor::ASSIGN)) {
+        if (
+            !$target->options['sendprivate']
+            && $target->obj->countSuppliers(CommonITILActor::ASSIGN)
+        ) {
             $dbu = new DbUtils();
             $supplierlinktable = $dbu->getTableForItemType($target->obj->supplierlinkclass);
             $fkfield = $target->obj->getForeignKeyField();
@@ -348,11 +352,11 @@ class PluginBehaviorsTicket
                 'LEFT JOIN' => [
                     'glpi_suppliers'
                     => [
-                        'FKEY' => [
-                            $supplierlinktable => 'suppliers_id',
-                            'glpi_suppliers' => 'id',
+                            'FKEY' => [
+                                $supplierlinktable => 'suppliers_id',
+                                'glpi_suppliers' => 'id',
+                            ],
                         ],
-                    ],
                 ],
                 'WHERE' => [$supplierlinktable . '.' . $fkfield => $target->obj->getID()],
             ];
@@ -399,8 +403,10 @@ class PluginBehaviorsTicket
         }
 
         if ($config->getField('use_requester_user_group') > 0) {
-            if (!isset($ticket->input['_groups_id_requester'])
-                || $ticket->input['_groups_id_requester'] == 0) {
+            if (
+                !isset($ticket->input['_groups_id_requester'])
+                || $ticket->input['_groups_id_requester'] == 0
+            ) {
                 $requesters = self::useRequesterUserGroup($ticket->input);
                 if (isset($ticket->input['_actors']['requester'])) {
                     $ticket->input['_actors']['requester'] = array_merge(
@@ -416,8 +422,10 @@ class PluginBehaviorsTicket
         }
 
         if ($config->getField('use_assign_user_group') > 0) {
-            if (!isset($ticket->input['_groups_id_assign'])
-                || $ticket->input['_groups_id_assign'] == 0) {
+            if (
+                !isset($ticket->input['_groups_id_assign'])
+                || $ticket->input['_groups_id_assign'] == 0
+            ) {
                 $assigns = self::useAssignTechGroup($ticket->input, 'use_assign_user_group');
                 if ($assigns !== null) {
                     $ticket->input['_actors']['assign'] = self::removeDuplicates($assigns);
@@ -425,7 +433,8 @@ class PluginBehaviorsTicket
             }
         }
 
-        if ($config->getField('ticketsolved_updatetech')
+        if (
+            $config->getField('ticketsolved_updatetech')
             && (isset($ticket->input['status'])
                 && in_array(
                     $ticket->input['status'],
@@ -436,7 +445,8 @@ class PluginBehaviorsTicket
                 ))
             && isset($ticket->input['_users_id_assign'])
             && (($ticket->input['_users_id_assign'] == 0)
-                || ($ticket->input['_users_id_assign'] != Session::getLoginUserID()))) {
+                || ($ticket->input['_users_id_assign'] != Session::getLoginUserID()))
+        ) {
             $ticket->input['_users_id_assign'] = Session::getLoginUserID();
         }
     }
@@ -470,12 +480,16 @@ class PluginBehaviorsTicket
     public static function useRequesterItemGroup($input)
     {
         $config = PluginBehaviorsConfig::getInstance();
-        if ($config->getField('use_requester_item_group')
+        if (
+            $config->getField('use_requester_item_group')
             && isset($input['items_id'])
-            && (is_array($input['items_id']))) {
+            && (is_array($input['items_id']))
+        ) {
             foreach ($input['items_id'] as $type => $items) {
-                if (($item = getItemForItemtype($type))
-                    && isset($input['_actors'])) {
+                if (
+                    ($item = getItemForItemtype($type))
+                    && isset($input['_actors'])
+                ) {
                     $actors_item = $input['_actors'];
 
                     //for simplified interface
@@ -544,16 +558,18 @@ class PluginBehaviorsTicket
                 if (isset($ticket->input['_users_id_requester_notif']['alternative_email'][0])) {
                     $email = $ticket->input['_users_id_requester_notif']['alternative_email'][0];
                     $condition = [
-                        'glpi_users.is_active'  => 1,
-                        'glpi_users.is_deleted' => 0, [
+                        'glpi_users.is_active' => 1,
+                        'glpi_users.is_deleted' => 0,
+                        [
                             'OR' => [
                                 ['glpi_users.begin_date' => null],
                                 ['glpi_users.begin_date' => ['<', new QueryExpression('NOW()')]],
                             ],
-                        ], [
-                            'OR'  => [
-                                ['glpi_users.end_date'   => null],
-                                ['glpi_users.end_date'   => ['>', new QueryExpression('NOW()')]],
+                        ],
+                        [
+                            'OR' => [
+                                ['glpi_users.end_date' => null],
+                                ['glpi_users.end_date' => ['>', new QueryExpression('NOW()')]],
                             ],
                         ],
                     ];
@@ -567,8 +583,10 @@ class PluginBehaviorsTicket
             }
 
             //for simplified interface or mailgate
-            if (count($actors_requester) == 0
-                && isset($input['_users_id_requester'])) {
+            if (
+                count($actors_requester) == 0
+                && isset($input['_users_id_requester'])
+            ) {
                 if (is_array($input['_users_id_requester'])) {
                     foreach ($input['_users_id_requester'] as $usr) {
                         if ($usr > 0) {
@@ -642,8 +660,10 @@ class PluginBehaviorsTicket
                                 true
                             );
                         }
-                        if ($grp > 0 && $requester['itemtype'] == 'Group'
-                            && $requester['items_id'] == $grp) {
+                        if (
+                            $grp > 0 && $requester['itemtype'] == 'Group'
+                            && $requester['items_id'] == $grp
+                        ) {
                             $ko++;
                         }
                         if ($grp > 0 && $ko == 0) {
@@ -663,8 +683,10 @@ class PluginBehaviorsTicket
                                 false
                             );
                         }
-                        if ($requester['itemtype'] == 'Group'
-                            && in_array($requester['items_id'], $grps)) {
+                        if (
+                            $requester['itemtype'] == 'Group'
+                            && in_array($requester['items_id'], $grps)
+                        ) {
                             unset($grps[$requester['items_id']]);
                         }
                         if (count($grps) > 0) {
@@ -699,8 +721,10 @@ class PluginBehaviorsTicket
             }
 
             //for simplified interface or mailgate
-            if (count($actors_assign) == 0
-                && isset($input['_users_id_assign'])) {
+            if (
+                count($actors_assign) == 0
+                && isset($input['_users_id_assign'])
+            ) {
                 if (is_array($input['_users_id_assign'])) {
                     foreach ($input['_users_id_assign'] as $usr) {
                         if ($usr > 0) {
@@ -775,7 +799,7 @@ class PluginBehaviorsTicket
                                 true
                             );
                         }
-//                        if ($grp > 0 && $assign['itemtype'] == 'Group'
+                        //                        if ($grp > 0 && $assign['itemtype'] == 'Group'
 //                            && $assign['items_id'] == $grp) {
 //                            $ko++;
 //                        }
@@ -796,8 +820,10 @@ class PluginBehaviorsTicket
                                 false
                             );
                         }
-                        if ($assign['itemtype'] == 'Group'
-                            && in_array($assign['items_id'], $grps)) {
+                        if (
+                            $assign['itemtype'] == 'Group'
+                            && in_array($assign['items_id'], $grps)
+                        ) {
                             unset($grps[$assign['items_id']]);
                         }
                         if (count($grps) > 0) {
@@ -830,11 +856,13 @@ class PluginBehaviorsTicket
 
         $config = PluginBehaviorsConfig::getInstance();
 
-        if ($config->getField('use_assign_user_group')
+        if (
+            $config->getField('use_assign_user_group')
             && isset($ticket->input['_users_id_assign'])
             && ($ticket->input['_users_id_assign'] > 0)
             && (!isset($ticket->input['_groups_id_assign'])
-                || ($ticket->input['_groups_id_assign'] <= 0))) {
+                || ($ticket->input['_groups_id_assign'] <= 0))
+        ) {
             if ($config->getField('use_assign_user_group') == 1) {
                 // First group
                 $ticket->input['_groups_id_assign']
@@ -873,8 +901,10 @@ class PluginBehaviorsTicket
         $config = PluginBehaviorsConfig::getInstance();
 
         // Check is the connected user is a tech
-        if (!is_numeric(Session::getLoginUserID(false))
-            || !Session::haveRight('ticket', UPDATE)) {
+        if (
+            !is_numeric(Session::getLoginUserID(false))
+            || !Session::haveRight('ticket', UPDATE)
+        ) {
             return false; // No check
         }
 
@@ -884,14 +914,16 @@ class PluginBehaviorsTicket
             }
         }
 
-        if (isset($ticket->input['status'])
+        if (
+            isset($ticket->input['status'])
             && in_array(
                 $ticket->input['status'],
                 array_merge(
                     Ticket::getSolvedStatusArray(),
                     Ticket::getClosedStatusArray()
                 )
-            )) {
+            )
+        ) {
             $sql = [
                 'SELECT' => [
                     'MAX' => 'id AS max',
@@ -906,8 +938,10 @@ class PluginBehaviorsTicket
             ];
 
             foreach ($DB->request($sql) as $data) {
-                if ($config->getField('is_ticketsolutiontype_mandatory')
-                    && ($data['solutiontypes_id'] == 0)) {
+                if (
+                    $config->getField('is_ticketsolutiontype_mandatory')
+                    && ($data['solutiontypes_id'] == 0)
+                ) {
                     unset($ticket->input['status']);
                     Session::addMessageAfterRedirect(
                         __(
@@ -918,8 +952,10 @@ class PluginBehaviorsTicket
                         ERROR
                     );
                 }
-                if ($config->getField('is_ticketsolution_mandatory')
-                    && empty($data['content'])) {
+                if (
+                    $config->getField('is_ticketsolution_mandatory')
+                    && empty($data['content'])
+                ) {
                     unset($ticket->input['status']);
                     Session::addMessageAfterRedirect(
                         __(
@@ -967,8 +1003,10 @@ class PluginBehaviorsTicket
                 }
             }
             if ($config->getField('is_tickettech_mandatory')) {
-                if (($ticket->countUsers(CommonITILActor::ASSIGN) == 0)
-                    && !$config->getField('ticketsolved_updatetech')) {
+                if (
+                    ($ticket->countUsers(CommonITILActor::ASSIGN) == 0)
+                    && !$config->getField('ticketsolved_updatetech')
+                ) {
                     unset($ticket->input['status']);
                     Session::addMessageAfterRedirect(
                         __(
@@ -1031,8 +1069,10 @@ class PluginBehaviorsTicket
             ?? $ticket->fields['itilcategories_id']);
 
         if ($config->getField('is_ticketcategory_mandatory_on_assign')) {
-            if (!$cat
-                && isset($ticket->input['_actors']['assign'])) {
+            if (
+                !$cat
+                && isset($ticket->input['_actors']['assign'])
+            ) {
                 $ticket->input = [];
                 Session::addMessageAfterRedirect(
                     __(
@@ -1045,23 +1085,37 @@ class PluginBehaviorsTicket
             }
         }
 
-//        if ($config->getField('use_requester_item_group')
+        //        if ($config->getField('use_requester_item_group')
 //            && isset($ticket->input['_actors']['requester'])) {
 //            $requesters = self::useRequesterItemGroup($ticket->input);
 //            if ($requesters !== null) {
 //                $ticket->input['_actors']['requester'] = self::removeDuplicates($requesters);
 //            }
-//        }
+// //        }
 
-        if ($config->getField('use_assign_user_group_update')
-            && isset($ticket->input['_actors']['assign'])) {
+        if ($config->getField('use_assign_user_group_update') && isset($ticket->input['_itil_assign'])) {
+            $ticket->input['_actors']['assign'] = $ticket->getActorsForType(CommonITILActor::ASSIGN);
+            $ticket->input['_actors']['assign'] = array_merge($ticket->input['_actors']['assign'], self::prepairActorsPayload($ticket->input['_itil_assign']));
+            $ticket->input['_actors']['requester'] = $ticket->getActorsForType(CommonITILActor::REQUESTER);
+            $ticket->input['_actors']['observer'] = $ticket->getActorsForType(CommonITILActor::OBSERVER);
+            $assigns = self::useAssignTechGroup($ticket->input, 'use_assign_user_group_update');
+            if ($assigns !== null) {
+                $assigns = self::removeDuplicates($assigns);
+            }
+        }
+
+        if (
+            $config->getField('use_assign_user_group_update')
+            && isset($ticket->input['_actors']['assign'])
+        ) {
             $assigns = self::useAssignTechGroup($ticket->input, 'use_assign_user_group_update');
             if ($assigns !== null) {
                 $ticket->input['_actors']['assign'] = self::removeDuplicates($assigns);
             }
         }
 
-        if ($config->getField('ticketsolved_updatetech')
+        if (
+            $config->getField('ticketsolved_updatetech')
             && $ticket->canUpdate()
             && isset($ticket->input['status'])
             && in_array(
@@ -1070,20 +1124,23 @@ class PluginBehaviorsTicket
                     Ticket::getSolvedStatusArray(),
                     Ticket::getClosedStatusArray()
                 )
-            )) {
+            )
+        ) {
             $ticket_user = new Ticket_User();
-            if (($ticket->countUsers(CommonITILActor::ASSIGN) == 0)
+            if (
+                ($ticket->countUsers(CommonITILActor::ASSIGN) == 0)
                 || (isset($ticket_user->fields['users_id'])
                     && ($ticket_user->fields['users_id'] != Session::getLoginUserID()))
                 && (((in_array($ticket->fields['status'], Ticket::getSolvedStatusArray()))
-                        && (in_array($ticket->input['status'], Ticket::getClosedStatusArray())))
+                    && (in_array($ticket->input['status'], Ticket::getClosedStatusArray())))
                     || !in_array(
                         $ticket->fields['status'],
                         array_merge(
                             Ticket::getSolvedStatusArray(),
                             Ticket::getClosedStatusArray()
                         )
-                    ))) {
+                    ))
+            ) {
                 $ticket_user->add([
                     'tickets_id' => $ticket->getID(),
                     'users_id' => Session::getLoginUserID(),
@@ -1099,14 +1156,20 @@ class PluginBehaviorsTicket
      */
     public static function onNewTicket()
     {
-        if (isset($_SESSION['glpiactiveprofile']['interface'])
-            && ($_SESSION['glpiactiveprofile']['interface'] == 'central')) {
-            if (strstr($_SERVER['PHP_SELF'], "/front/ticket.form.php")
-                && (!isset($_POST['id']) || ($_POST['id'] == 0))) {
+        if (
+            isset($_SESSION['glpiactiveprofile']['interface'])
+            && ($_SESSION['glpiactiveprofile']['interface'] == 'central')
+        ) {
+            if (
+                strstr($_SERVER['PHP_SELF'], "/front/ticket.form.php")
+                && (!isset($_POST['id']) || ($_POST['id'] == 0))
+            ) {
                 $config = PluginBehaviorsConfig::getInstance();
 
-                if ($config->getField('use_requester_user_group') > 0
-                    && isset($_POST['_actors'])) {
+                if (
+                    $config->getField('use_requester_user_group') > 0
+                    && isset($_POST['_actors'])
+                ) {
                     $actors = json_decode($_POST['_actors'], true);
                     if (isset($actors['requester'])) {
                         $requesters = $actors['requester'];
@@ -1124,11 +1187,13 @@ class PluginBehaviorsTicket
                                         $requester['items_id'],
                                         true
                                     );
-                                    if ($grp > 0 && !isset($_SESSION['glpi_behaviors_auto_group_request'])
+                                    if (
+                                        $grp > 0 && !isset($_SESSION['glpi_behaviors_auto_group_request'])
                                         || (isset($_SESSION['glpi_behaviors_auto_group_request'])
                                             && is_array($_SESSION['glpi_behaviors_auto_group_request'])
                                             && !in_array($grp, $_SESSION['glpi_behaviors_auto_group_request']))
-                                        && !in_array($grp, $group_requester_actors)) {
+                                        && !in_array($grp, $group_requester_actors)
+                                    ) {
                                         $actors['requester'][] = [
                                             'itemtype' => 'Group',
                                             'items_id' => $grp,
@@ -1147,11 +1212,13 @@ class PluginBehaviorsTicket
                                         false
                                     );
                                     foreach ($grps as $grp) {
-                                        if (!isset($_SESSION['glpi_behaviors_auto_group_request'])
+                                        if (
+                                            !isset($_SESSION['glpi_behaviors_auto_group_request'])
                                             || (isset($_SESSION['glpi_behaviors_auto_group_request'])
                                                 && is_array($_SESSION['glpi_behaviors_auto_group_request'])
                                                 && !in_array($grp, $_SESSION['glpi_behaviors_auto_group_request']))
-                                            && !in_array($grp, $group_requester_actors)) {
+                                            && !in_array($grp, $group_requester_actors)
+                                        ) {
                                             $actors['requester'][] = [
                                                 'itemtype' => 'Group',
                                                 'items_id' => $grp,
@@ -1171,8 +1238,10 @@ class PluginBehaviorsTicket
                     unset($_SESSION['glpi_behaviors_auto_group_request']);
                 }
 
-                if ($config->getField('use_assign_user_group') > 0
-                    && isset($_POST['_actors'])) {
+                if (
+                    $config->getField('use_assign_user_group') > 0
+                    && isset($_POST['_actors'])
+                ) {
                     $actors = json_decode($_POST['_actors'], true);
                     if (isset($actors['assign'])) {
                         $assigneds = $actors['assign'];
@@ -1190,11 +1259,13 @@ class PluginBehaviorsTicket
                                         $assigned['items_id'],
                                         true
                                     );
-                                    if ($grp > 0 && !isset($_SESSION['glpi_behaviors_auto_group_assign'])
+                                    if (
+                                        $grp > 0 && !isset($_SESSION['glpi_behaviors_auto_group_assign'])
                                         || (isset($_SESSION['glpi_behaviors_auto_group_assign'])
                                             && is_array($_SESSION['glpi_behaviors_auto_group_assign'])
                                             && !in_array($grp, $_SESSION['glpi_behaviors_auto_group_assign']))
-                                        && !in_array($grp, $group_assign_actors)) {
+                                        && !in_array($grp, $group_assign_actors)
+                                    ) {
                                         $actors['assign'][] = [
                                             'itemtype' => 'Group',
                                             'items_id' => $grp,
@@ -1213,11 +1284,13 @@ class PluginBehaviorsTicket
                                         false
                                     );
                                     foreach ($grps as $grp) {
-                                        if (!isset($_SESSION['glpi_behaviors_auto_group_assign'])
+                                        if (
+                                            !isset($_SESSION['glpi_behaviors_auto_group_assign'])
                                             || (isset($_SESSION['glpi_behaviors_auto_group_assign'])
                                                 && is_array($_SESSION['glpi_behaviors_auto_group_assign'])
                                                 && !in_array($grp, $_SESSION['glpi_behaviors_auto_group_assign']))
-                                            && !in_array($grp, $group_assign_actors)) {
+                                            && !in_array($grp, $group_assign_actors)
+                                        ) {
                                             $actors['assign'][] = [
                                                 'itemtype' => 'Group',
                                                 'items_id' => $grp,
@@ -1252,22 +1325,26 @@ class PluginBehaviorsTicket
     {
         $config = PluginBehaviorsConfig::getInstance();
 
-        if ($config->getField('add_notif')
-            && in_array('status', $ticket->updates)) {
-            if (in_array(
-                $ticket->oldvalues['status'],
-                array_merge(
-                    Ticket::getSolvedStatusArray(),
-                    Ticket::getClosedStatusArray()
+        if (
+            $config->getField('add_notif')
+            && in_array('status', $ticket->updates)
+        ) {
+            if (
+                in_array(
+                    $ticket->oldvalues['status'],
+                    array_merge(
+                        Ticket::getSolvedStatusArray(),
+                        Ticket::getClosedStatusArray()
+                    )
                 )
-            )
                 && !in_array(
                     $ticket->input['status'],
                     array_merge(
                         Ticket::getSolvedStatusArray(),
                         Ticket::getClosedStatusArray()
                     )
-                )) {
+                )
+            ) {
                 NotificationEvent::raiseEvent('plugin_behaviors_ticketreopen', $ticket);
             } elseif ($ticket->oldvalues['status'] <> $ticket->input['status']) {
                 if ($ticket->input['status'] == CommonITILObject::WAITING) {
@@ -1364,13 +1441,15 @@ class PluginBehaviorsTicket
         ];
         $link->add($inputlink);
 
-        if ($dbu->countElementsInTable(
-            "glpi_documents_items",
-            [
-                'itemtype' => 'Ticket',
-                'items_id' => $oldid,
-            ]
-        )) {
+        if (
+            $dbu->countElementsInTable(
+                "glpi_documents_items",
+                [
+                    'itemtype' => 'Ticket',
+                    'items_id' => $oldid,
+                ]
+            )
+        ) {
             $docitem = new Document_Item();
             foreach (
                 $DB->request("glpi_documents_items", [
@@ -1431,5 +1510,52 @@ class PluginBehaviorsTicket
         foreach ($DB->request($query, '', true) as $data) {
             $target->addToRecipientsList($data);
         }
+
+
+    }
+    public static function prepairActorsPayload($data)
+    {
+        $actors = array();
+        $fn_add_actor = static function (string $itemtype, int $items_id, array $params) use (&$actors) {
+            $already_added = !empty(array_filter($actors, static function ($actor) use ($itemtype, $items_id, $params) {
+                if ($actor['itemtype'] === $itemtype && (int) $actor['items_id'] === 0) {
+                    // Anonymous actors unique based on email
+                    return ($actor['alternative_email'] ?? null) === ($params['alternative_email'] ?? null);
+                }
+                return $actor['itemtype'] === $itemtype && (int) $actor['items_id'] === $items_id;
+            }));
+            if (!$already_added) {
+                $actors[] = [
+                    'itemtype' => $itemtype,
+                    'items_id' => $items_id,
+                ] + $params;
+            }
+        };
+
+
+        if ($data['users_id'] > 0) {
+            $userobj = new User();
+
+            if ($userobj->getFromDB($data['users_id'])) {
+
+                $name = formatUserName(
+                    $userobj->fields["id"],
+                    $userobj->fields["name"],
+                    $userobj->fields["realname"],
+                    $userobj->fields["firstname"]
+                );
+                $email = UserEmail::getDefaultForUser($data['users_id']);
+                $fn_add_actor('User', $data['users_id'], [
+                    'text' => $name,
+                    'title' => $name,
+                    'use_notification' => $email === '' ? false : true,
+                    'default_email' => $email,
+                    'alternative_email' => '',
+                ]);
+            }
+
+
+        }
+        return $actors;
     }
 }
