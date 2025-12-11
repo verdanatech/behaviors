@@ -32,18 +32,15 @@
  * --------------------------------------------------------------------------
  */
 
-use GlpiPlugin\Behaviors\Config;
+namespace GlpiPlugin\Behaviors;
 
-global $CFG_GLPI;
-$config = new Config();
-if (isset($_POST["update"])) {
-    $config->check($_POST['id'], UPDATE);
-
-    $config->update($_POST);
-
-    Html::back();
+class TicketSatisfaction
+{
+    /**
+     * @param TicketSatisfaction $ticketsatisfaction
+     * @return void
+     */
+    public static function afterUpdate(\TicketSatisfaction $ticketsatisfaction)
+    {
+    }
 }
-Html::redirect(
-    $CFG_GLPI["root_doc"] . "/front/config.form.php?forcetab="
-    . urlencode('GlpiPlugin\Behaviors\Config$1')
-);

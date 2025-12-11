@@ -32,13 +32,19 @@
  * --------------------------------------------------------------------------
  */
 
-class PluginBehaviorsITILSolution
+namespace GlpiPlugin\Behaviors;
+use AllowDynamicProperties;
+use CommonITILActor;
+use Session;
+
+#[AllowDynamicProperties]
+class ITILSolution
 {
     /**
      * @param ITILSolution $soluce
      * @return false|void
      */
-    public static function beforeAdd(ITILSolution $soluce)
+    public static function beforeAdd(\ITILSolution $soluce)
     {
         global $DB;
 
@@ -47,7 +53,7 @@ class PluginBehaviorsITILSolution
             return false;
         }
 
-        $config = PluginBehaviorsConfig::getInstance();
+        $config = Config::getInstance();
 
         // Check is the connected user is a tech
         if (!is_numeric(Session::getLoginUserID(false))
@@ -56,7 +62,7 @@ class PluginBehaviorsITILSolution
         }
 
         // Want to solve/close the ticket
-        $ticket = new Ticket();
+        $ticket = new \Ticket();
         if ($ticket->getFromDB($soluce->input['items_id'])
             && ($soluce->input['itemtype'] == 'Ticket')) {
             if ($config->getField('is_ticketsolutiontype_mandatory')
@@ -103,7 +109,7 @@ class PluginBehaviorsITILSolution
             //
             //                if (isset($soluce->input['duration_solution'])
             //                    && $soluce->input['duration_solution'] > 0) {
-            //                    $ticket = new Ticket();
+            //                    $ticket = new \Ticket();
             //                    $tickets_id = $soluce->input['items_id'];
             //                    if ($ticket->getFromDB($tickets_id)) {
             //                        if ($ticket->getField('actiontime') == 0) {
@@ -138,7 +144,7 @@ class PluginBehaviorsITILSolution
             //                        && $configglpi['system_user'] == $soluce->input['users_id']) {
             //                        return true;
             //                    }
-            //                    $ticket = new Ticket();
+            //                    $ticket = new \Ticket();
             //                    $tickets_id = $soluce->input['items_id'];
             //                    $ticket->getFromDB($tickets_id);
             //                    $dur = (isset($ticket->fields['actiontime']) ? $ticket->fields['actiontime'] : 0);
@@ -210,36 +216,15 @@ class PluginBehaviorsITILSolution
                 );
                 return;
             }
-            $params = [
-                'itemtype'         => 'Ticket',
-                'items_id'         => $ticket->fields['id']
-            ];
-            $existing = $DB->request(
-                'glpi_knowbaseitems_items',
-                $params
-            );
-             if ($config->getField('is_knowbaseincident_mandatory') && $ticket->fields['type'] == Ticket::INCIDENT_TYPE) {
-                if ($existing->numrows() == 0 && empty($soluce->input['kb_linked_id'])) {
-                      $soluce->input = false;
-                Session::addMessageAfterRedirect(__("Kbowbase Item is mandatory before ticket is solved/closed",
-                                                 'behaviors'), true, ERROR);
-                return;
-                }
-             }
-             if ($config->getField('is_knowbaserequest_mandatory') && $ticket->fields['type'] == Ticket::DEMAND_TYPE) {
-                if ($existing->numrows() == 0 && empty($soluce->input['kb_linked_id'])) {
-                      $soluce->input = false;
-                Session::addMessageAfterRedirect(__("Kbowbase Item is mandatory before ticket is solved/closed",
-                                                 'behaviors'), true, ERROR);
-                return;
-                }
-             }
             if ($config->getField('is_tickettasktodo')) {
+                $crit = [
+                    'FROM' => 'glpi_tickettasks',
+                    'WHERE' => [
+                        'tickets_id' => $ticket->getField('id')
+                    ]
+                ];
                 foreach (
-                    $DB->request(
-                        'glpi_tickettasks',
-                        ['tickets_id' => $ticket->getField('id')]
-                    ) as $task
+                    $DB->request($crit) as $task
                 ) {
                     if ($task['state'] == 1) {
                         $soluce->input = false;
@@ -258,7 +243,7 @@ class PluginBehaviorsITILSolution
         }
 
         // Want to solve/close the problem
-        $problem = new Problem();
+        $problem = new \Problem();
         if ($problem->getFromDB($soluce->input['items_id'])
             && ($soluce->input['itemtype'] == 'Problem')) {
             if ($config->getField('is_problemsolutiontype_mandatory')
@@ -275,11 +260,14 @@ class PluginBehaviorsITILSolution
                 return;
             }
             if ($config->getField('is_problemtasktodo')) {
+                $crit = [
+                    'FROM' => 'glpi_problemtasks',
+                    'WHERE' => [
+                        'problems_id' => $problem->getField('id')
+                    ]
+                ];
                 foreach (
-                    $DB->request(
-                        'glpi_problemtasks',
-                        ['problems_id' => $problem->getField('id')]
-                    ) as $task
+                    $DB->request($crit) as $task
                 ) {
                     if ($task['state'] == 1) {
                         $soluce->input = false;
@@ -298,15 +286,21 @@ class PluginBehaviorsITILSolution
         }
 
         // Want to solve/close the
-        $change = new Change();
+        $change = new \Change();
         if ($change->getFromDB($soluce->input['items_id'])
             && $soluce->input['itemtype'] == 'Change') {
             if ($config->getField('is_changetasktodo')) {
+
+                $crit = [
+                    'FROM' => 'glpi_changetasks',
+                    'WHERE' => [
+                        'changes_id' => $change->getField('id')
+                    ]
+                ];
+
                 foreach (
                     $DB->request(
-                        'glpi_changetasks',
-                        ['changes_id' => $change->getField('id')]
-                    ) as $task
+                        $crit) as $task
                 ) {
                     if ($task['state'] == 1) {
                         $soluce->input = false;
@@ -330,15 +324,15 @@ class PluginBehaviorsITILSolution
      * @param ITILSolution $soluce
      * @return false|void
      */
-    public static function beforeUpdate(ITILSolution $soluce)
+    public static function beforeUpdate(\ITILSolution $soluce)
     {
         if (!is_array($soluce->input) || !count($soluce->input)) {
             // Already cancel by another plugin
             return false;
         }
 
-        //Toolbox::logDebug("PluginBehaviorsTicket::beforeAdd(), Ticket=", $ticket);
-        $config = PluginBehaviorsConfig::getInstance();
+        //Toolbox::logDebug("Ticket::beforeAdd(), Ticket=", $ticket);
+        $config = Config::getInstance();
 
         // Check is the connected user is a tech
         if (!is_numeric(Session::getLoginUserID(false))
@@ -384,15 +378,15 @@ class PluginBehaviorsITILSolution
      * @param ITILSolution $soluce
      * @return void
      */
-    public static function afterAdd(ITILSolution $soluce)
+    public static function afterAdd(\ITILSolution $soluce)
     {
-        $ticket = new Ticket();
-        $config = PluginBehaviorsConfig::getInstance();
+        $ticket = new \Ticket();
+        $config = Config::getInstance();
         if ($ticket->getFromDB($soluce->input['items_id'])
             && $soluce->input['itemtype'] == 'Ticket') {
 
             if ($config->getField('ticketsolved_updatetech')) {
-                $ticket_user = new Ticket_User();
+                $ticket_user = new \Ticket_User();
                 $ticket_user->getFromDBByCrit([
                     'tickets_id' => $ticket->getID(),
                     'type' => CommonITILActor::ASSIGN,

@@ -32,18 +32,50 @@
  * --------------------------------------------------------------------------
  */
 
-use GlpiPlugin\Behaviors\Config;
+namespace GlpiPlugin\Behaviors;
 
-global $CFG_GLPI;
-$config = new Config();
-if (isset($_POST["update"])) {
-    $config->check($_POST['id'], UPDATE);
+use ProfileRight;
 
-    $config->update($_POST);
+class Profile extends Common
+{
+    /**
+     * @param Profile $srce
+     * @param array $input
+     * @return array
+     */
+    public static function preClone(\Profile $srce, array $input)
+    {
+        // decode array
+        if (isset($input['helpdesk_item_type'])
+            && !is_array($input['helpdesk_item_type'])) {
+            $input['helpdesk_item_type'] = importArrayFromDB($input['helpdesk_item_type']);
+        }
 
-    Html::back();
+        // Empty/NULL case
+        if (!isset($input['helpdesk_item_type'])
+            || !is_array($input['helpdesk_item_type'])) {
+            $input['helpdesk_item_type'] = [];
+        }
+
+        if (!isset($input['managed_domainrecordtypes'])
+            || !is_array($input['managed_domainrecordtypes'])) {
+            $input["managed_domainrecordtypes"] = [];
+        }
+
+        return $input;
+    }
+
+
+    /**
+     * @param $clone      Profile item
+     * @param $oldid
+     * @since version 0.90.1
+     *
+     */
+    public static function postClone(\Profile $clone, $oldid)
+    {
+        $rights = ProfileRight::getProfileRights($oldid);
+        $pright = new ProfileRight();
+        $pright->updateProfileRights($clone->getID(), $rights);
+    }
 }
-Html::redirect(
-    $CFG_GLPI["root_doc"] . "/front/config.form.php?forcetab="
-    . urlencode('GlpiPlugin\Behaviors\Config$1')
-);

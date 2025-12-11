@@ -32,18 +32,23 @@
  * --------------------------------------------------------------------------
  */
 
-use GlpiPlugin\Behaviors\Config;
+namespace GlpiPlugin\Behaviors;
 
-global $CFG_GLPI;
-$config = new Config();
-if (isset($_POST["update"])) {
-    $config->check($_POST['id'], UPDATE);
+use Session;
 
-    $config->update($_POST);
+class Supplier_Ticket
+{
+    /**
+     * @param Supplier_Ticket $item
+     * @return false|void
+     */
+    public static function afterAdd(\Supplier_Ticket $item)
+    {
+        // Check is the connected user is a tech
+        if (!is_numeric(Session::getLoginUserID(false))
+            || !Session::haveRight('ticket', \Ticket::OWN)) {
+            return false; // No check
+        }
+    }
 
-    Html::back();
 }
-Html::redirect(
-    $CFG_GLPI["root_doc"] . "/front/config.form.php?forcetab="
-    . urlencode('GlpiPlugin\Behaviors\Config$1')
-);

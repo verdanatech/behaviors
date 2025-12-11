@@ -20,7 +20,7 @@
  * along with Behaviors. If not, see <http://www.gnu.org/licenses/>.
  *
  * @package   behaviors
- * @author    Verdanatech, Infotel, Remi Collet, Nelly Mahu-Lasson
+ * @author    Infotel, Remi Collet, Nelly Mahu-Lasson
  * @copyright Copyright (c) 2018-2025 Behaviors plugin team
  * @license   AGPL License 3.0 or (at your option) any later version
  * http://www.gnu.org/licenses/agpl-3.0-standalone.html
@@ -51,20 +51,20 @@ $tables = $DB->request($sql);
 foreach ($tables as $table) {
    if ($DB->FieldExists($table['table_name'], 'tickets_id')) {
          $query = "ALTER TABLE ".$table['table_name'] ." CHANGE `tickets_id` `tickets_id` INT(11) UNSIGNED NOT NULL;";
-         $DB->queryOrDie($query);
+         $DB->doQuery($query);
    }
    if ($DB->FieldExists($table['table_name'], 'changes_id')) {
       $query = "ALTER TABLE ".$table['table_name'] ." CHANGE `changes_id` `changes_id` INT(11) UNSIGNED NOT NULL;";
-      $DB->queryOrDie($query);
+      $DB->doQuery($query);
    }
    if ($DB->FieldExists($table['table_name'], 'items_id')) {
          $query = "ALTER TABLE ".$table['table_name'] ." CHANGE `items_id` `items_id` INT(11) UNSIGNED NOT NULL;";
-         $DB->queryOrDie($query);
+         $DB->doQuery($query);
    }
 }
 
 $query = "ALTER TABLE `glpi_tickets` CHANGE `id` `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT;";
-$DB->queryOrDie($query);
+$DB->doQuery($query);
 
 $query = "ALTER TABLE `glpi_changes` CHANGE `id` `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT;";
-$DB->queryOrDie($query);
+$DB->doQuery($query);

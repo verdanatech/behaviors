@@ -121,6 +121,7 @@ class PluginBehaviorsConfig extends CommonDBTM
                      `is_knowbaseincident_mandatory` tinyint NOT NULL default '0',
                      `is_satisfaction_hide_observer` tinyint NOT NULL default '0',
                      `is_satisfaction_hide_tech` tinyint NOT NULL default '0',
+                     `is_ticketvalidationtodo` tinyint NOT NULL default '0',
                      PRIMARY KEY  (`id`)
                    ) ENGINE=InnoDB  DEFAULT CHARSET = {$default_charset}
                      COLLATE = {$default_collation} ROW_FORMAT=DYNAMIC";
@@ -129,6 +130,7 @@ class PluginBehaviorsConfig extends CommonDBTM
                 __('Error in creating glpi_plugin_behaviors_configs', 'behaviors') .
                 "<br>" . $DB->error()
             );
+
             $query = "INSERT INTO `$table`
                          (id, date_mod)
                    VALUES (1, NOW())";
@@ -271,6 +273,10 @@ class PluginBehaviorsConfig extends CommonDBTM
             //version 2.7.6
             $mig->dropField($table, 'is_requester_mandatory');
             $mig->dropField($table, 'use_lock');
+            
+            //version 2.7.8.1
+            $mig->addField($table, 'is_ticketvalidationtodo', 'bool', ['after' => 'is_satisfaction_hide_tech']);
+
         }
     }
 
@@ -583,7 +589,12 @@ class PluginBehaviorsConfig extends CommonDBTM
       echo "</td><td>";
       Dropdown::showYesNo("is_knowbaseincident_mandatory", $config->fields['is_knowbaseincident_mandatory']);
       echo "</td><td colspan='2'></td></tr>";
-
+      
+      echo "<tr class='tab_bg_1'>";
+      echo "<td>" . __('Block the solving/closing of a the ticket if the global validation state is waiting for validation', 'behaviors');
+      echo "</td><td>";
+      Dropdown::showYesNo("is_ticketvalidationtodo", $config->fields['is_ticketvalidationtodo']);
+      echo "</td><td colspan='2'></td></tr>";
 
       echo "<tr class='tab_bg_1'>";
       echo "<th colspan='2' class='center' width='60%'>" . __('Assistance') . "</th>";
@@ -600,6 +611,8 @@ class PluginBehaviorsConfig extends CommonDBTM
       echo "</td><td>";
       Dropdown::showYesNo("is_satisfaction_hide_tech", $config->fields['is_satisfaction_hide_tech']);
       echo "</td><td colspan='2'></td></tr>";
+
+   
 
 
       echo "</td></tr>\n";
