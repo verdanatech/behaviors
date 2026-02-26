@@ -32,18 +32,37 @@
  * --------------------------------------------------------------------------
  */
 
-use GlpiPlugin\Behaviors\Config;
+namespace GlpiPlugin\Behaviors;
 
-global $CFG_GLPI;
-$config = new Config();
-if (isset($_POST["update"])) {
-    $config->check($_POST['id'], UPDATE);
+use DbUtils;
+use NotificationTemplateTranslation;
 
-    $config->update($_POST);
+class NotificationTemplate extends Common
+{
+    /**
+     * @param NotificationTemplate $clone
+     * @param $oldid
+     * @return void
+     */
+    public static function postClone(NotificationTemplate $clone, $oldid)
+    {
+        global $DB;
 
-    Html::back();
+        $trad = new NotificationTemplateTranslation();
+        $dbu = new DbUtils();
+        $fkey = $dbu->getForeignKeyFieldForTable($clone->getTable());
+
+        $crit = [
+            'FROM' => $trad->getTable(),
+            'WHERE' => [
+                $fkey => $oldid
+            ]
+        ];
+
+        foreach ($DB->request($crit) as $data) {
+            unset($data['id']);
+            $data[$fkey] = $clone->getID();
+            $trad->add($data);
+        }
+    }
 }
-Html::redirect(
-    $CFG_GLPI["root_doc"] . "/front/config.form.php?forcetab="
-    . urlencode('GlpiPlugin\Behaviors\Config$1')
-);

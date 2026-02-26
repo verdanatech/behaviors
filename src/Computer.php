@@ -32,18 +32,23 @@
  * --------------------------------------------------------------------------
  */
 
-use GlpiPlugin\Behaviors\Config;
+namespace GlpiPlugin\Behaviors;
 
-global $CFG_GLPI;
-$config = new Config();
-if (isset($_POST["update"])) {
-    $config->check($_POST['id'], UPDATE);
+use PluginUninstallUninstall;
 
-    $config->update($_POST);
+class Computer extends Common
+{
+    /**
+     * @param Computer $comp
+     * @return void
+     */
+    public static function beforePurge(\Computer $comp)
+    {
+        $config = Config::getInstance();
 
-    Html::back();
+        if (($config->getField('remove_from_ocs') > 0)
+            && class_exists('PluginUninstallUninstall')) {
+            PluginUninstallUninstall::deleteComputerInOCSByGlpiID($comp->fields['id']);
+        }
+    }
 }
-Html::redirect(
-    $CFG_GLPI["root_doc"] . "/front/config.form.php?forcetab="
-    . urlencode('GlpiPlugin\Behaviors\Config$1')
-);

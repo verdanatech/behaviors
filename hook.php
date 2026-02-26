@@ -31,14 +31,14 @@
  * --------------------------------------------------------------------------
  */
 
+use GlpiPlugin\Behaviors\Config;
+
 function plugin_behaviors_install()
 {
 
-    $migration = new Migration(277);
+    $migration = new Migration(PLUGIN_BEHAVIORS_VERSION);
 
-   // No autoload when plugin is not activated
-    require_once('inc/config.class.php');
-    PluginBehaviorsConfig::install($migration);
+    Config::install($migration);
 
     $migration->executeMigration();
 
@@ -49,14 +49,7 @@ function plugin_behaviors_install()
 function plugin_behaviors_uninstall()
 {
 
-   // No autoload when plugin is not activated
-    require 'inc/config.class.php';
-
-    $migration = new Migration(277);
-
-    PluginBehaviorsConfig::uninstall($migration);
-
-    $migration->executeMigration();
+    Config::uninstall();
 
     return true;
 }

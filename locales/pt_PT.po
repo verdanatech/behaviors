@@ -2,34 +2,36 @@
 # Copyright (C) YEAR Behaviors Development Team
 # This file is distributed under the same license as the GLPI - Behaviors plugin package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
+# 
 # Translators:
 # Xavier CAILLAUD <thetsmr@gmail.com>, 2025
 # André Petinga <andre.petinga@ipleiria.pt>, 2025
-#
+# 
+#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: GLPI - Behaviors plugin\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-08 16:14+0000\n"
-"PO-Revision-Date: 2025-08-21 08:06-0300\n"
+"PO-Revision-Date: 2025-04-26 07:42+0000\n"
 "Last-Translator: André Petinga <andre.petinga@ipleiria.pt>, 2025\n"
 "Language-Team: Portuguese (Portugal) (https://app.transifex.com/infotelGLPI/teams/250760/pt_PT/)\n"
-"Language: pt_PT\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: pt_PT\n"
 "Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
-"X-Generator: Poedit 3.2.2\n"
 
-#: setup.php:115 inc/common.class.php:107 inc/config.class.php:60 inc/document_item.class.php:52
-#: inc/document_item.class.php:59 inc/ticket.class.php:58 inc/ticket.class.php:65 inc/ticket.class.php:72
-#: inc/ticket.class.php:95 inc/ticket.class.php:103 inc/ticket.class.php:111 inc/ticket.class.php:119
-#: inc/ticket.class.php:127 inc/ticket.class.php:135
+#: setup.php:115 inc/common.class.php:107 inc/config.class.php:60
+#: inc/document_item.class.php:52 inc/document_item.class.php:59
+#: inc/ticket.class.php:58 inc/ticket.class.php:65 inc/ticket.class.php:72
+#: inc/ticket.class.php:95 inc/ticket.class.php:103 inc/ticket.class.php:111
+#: inc/ticket.class.php:119 inc/ticket.class.php:127 inc/ticket.class.php:135
 msgid "Behaviours"
 msgstr "Behaviours"
 
-#: inc/change.class.php:108 inc/common.class.php:379 inc/itilsolution.class.php:291
+#: inc/change.class.php:108 inc/common.class.php:379
+#: inc/itilsolution.class.php:291
 msgid "You cannot solve/close a change with task do to"
 msgstr "Não pode concluir/fechar a alteração com tarefas por concluir"
 
@@ -45,27 +47,37 @@ msgstr "Clonar"
 msgid "Clone of"
 msgstr "Clone de"
 
-#: inc/common.class.php:305 inc/config.class.php:560 inc/itilsolution.class.php:93 inc/ticket.class.php:932
+#: inc/common.class.php:305 inc/config.class.php:560
+#: inc/itilsolution.class.php:93 inc/ticket.class.php:932
 msgid "Duration is mandatory before ticket is solved/closed"
 msgstr "Duração é obrigatória antes de concluir/fechar o ticket"
 
-#: inc/common.class.php:310 inc/config.class.php:507 inc/itilsolution.class.php:165 inc/ticket.class.php:945
+#: inc/common.class.php:310 inc/config.class.php:507
+#: inc/itilsolution.class.php:165 inc/ticket.class.php:945
 msgid "Category is mandatory before ticket is solved/closed"
 msgstr "A categoria é obrigatória antes de concluir/fechar o ticket"
 
-#: inc/common.class.php:318 inc/config.class.php:459 inc/itilsolution.class.php:179 inc/ticket.class.php:960
+#: inc/common.class.php:318 inc/config.class.php:459
+#: inc/itilsolution.class.php:179 inc/ticket.class.php:960
 msgid "Technician assigned is mandatory before ticket is solved/closed"
-msgstr "É obrigatório ter um Técnico atribuído antes de concluir/fechar o ticket"
+msgstr ""
+"É obrigatório ter um Técnico atribuído antes de concluir/fechar o ticket"
 
-#: inc/common.class.php:327 inc/config.class.php:485 inc/itilsolution.class.php:192 inc/ticket.class.php:974
-msgid "Group of technicians assigned is mandatory before ticket is solved/closed"
-msgstr "É obrigatório ter um Grupo de técnicos atribuído antes de concluir/fechar o ticket"
+#: inc/common.class.php:327 inc/config.class.php:485
+#: inc/itilsolution.class.php:192 inc/ticket.class.php:974
+msgid ""
+"Group of technicians assigned is mandatory before ticket is solved/closed"
+msgstr ""
+"É obrigatório ter um Grupo de técnicos atribuído antes de concluir/fechar o "
+"ticket"
 
-#: inc/common.class.php:335 inc/config.class.php:516 inc/itilsolution.class.php:205 inc/ticket.class.php:987
+#: inc/common.class.php:335 inc/config.class.php:516
+#: inc/itilsolution.class.php:205 inc/ticket.class.php:987
 msgid "Location is mandatory before ticket is solved/closed"
 msgstr "A localização é obrigatória antes de concluir/fechar o ticket"
 
-#: inc/common.class.php:347 inc/itilsolution.class.php:224 inc/ticket.class.php:1005
+#: inc/common.class.php:347 inc/itilsolution.class.php:224
+#: inc/ticket.class.php:1005
 msgid "You cannot solve/close a ticket with task do to"
 msgstr "Não pode concluir/fechar o ticket com tarefas por concluir"
 
@@ -85,7 +97,8 @@ msgstr "Tem de adicionar o tipo de solução. É obrigatório"
 msgid "You cannot resolve the ticket"
 msgstr "Não pode concluir o ticket"
 
-#: inc/common.class.php:449 inc/tickettask.class.php:64 inc/tickettask.class.php:102
+#: inc/common.class.php:449 inc/tickettask.class.php:64
+#: inc/tickettask.class.php:102
 msgid "You must define a category. it's mandatory"
 msgstr "Tem de definir uma categoria. É obrigatório"
 
@@ -168,7 +181,8 @@ msgstr "Na entidade do item"
 msgid "Task category is mandatory in a task"
 msgstr "A categoria da tarefa é obrigatória numa tarefa"
 
-#: inc/config.class.php:398 inc/itilsolution.class.php:245 inc/problem.class.php:79
+#: inc/config.class.php:398 inc/itilsolution.class.php:245
+#: inc/problem.class.php:79
 msgid "Type of solution is mandatory before problem is solved/closed"
 msgstr "Tipo da solução é obrigatório antes de concluir/fechar um problema"
 
@@ -178,7 +192,8 @@ msgstr "Negar a mudança da data de criação do ticket"
 
 #: inc/config.class.php:410
 msgid "Block the solving/closing of a problem if task do to"
-msgstr "Bloquear a conclusão/fecho do problema se existirem tarefas não concluídas"
+msgstr ""
+"Bloquear a conclusão/fecho do problema se existirem tarefas não concluídas"
 
 #: inc/config.class.php:416
 msgid "Single technician and group"
@@ -210,25 +225,27 @@ msgstr "Adicionar a solução do ticket"
 
 #: inc/config.class.php:468
 msgid "Block the solving/closing of a change if task do to"
-msgstr "Bloquear a conclusão/fecho da alteração se existirem tarefas não concluídas"
+msgstr ""
+"Bloquear a conclusão/fecho da alteração se existirem tarefas não concluídas"
 
 #: inc/config.class.php:474
 msgid "Set the solution writer as the technician of the ticket"
 msgstr "Atribuir a autoria da solução ao técnico do ticket"
 
-#: inc/config.class.php:528 inc/itilsolution.class.php:80 inc/itilsolution.class.php:348
-#: inc/ticket.class.php:907
+#: inc/config.class.php:528 inc/itilsolution.class.php:80
+#: inc/itilsolution.class.php:348 inc/ticket.class.php:907
 msgid "Description of solution is mandatory before ticket is solved/closed"
 msgstr "Descrição da solução é obrigatória antes de concluir/fechar o ticket"
 
-#: inc/config.class.php:542 inc/itilsolution.class.php:67 inc/itilsolution.class.php:333
-#: inc/ticket.class.php:895
+#: inc/config.class.php:542 inc/itilsolution.class.php:67
+#: inc/itilsolution.class.php:333 inc/ticket.class.php:895
 msgid "Type of solution is mandatory before ticket is solved/closed"
 msgstr "Tipo da solução é obrigatório antes de concluir/fechar o ticket"
 
 #: inc/config.class.php:553
 msgid "Block the solving/closing of a the ticket if task do to"
-msgstr "Bloquear a conclusão/fecho do ticket se existirem tarefas não concluídas"
+msgstr ""
+"Bloquear a conclusão/fecho do ticket se existirem tarefas não concluídas"
 
 #: inc/document_item.class.php:53
 msgid "Add document to ticket"
@@ -281,31 +298,3 @@ msgstr "Último grupo atribuído sem supervisor"
 #: inc/tickettask.class.php:123
 msgid "You cannot change status of a task in a solved ticket"
 msgstr "Não pode alterar o estado de uma tarefa num ticket concluído"
-
-#: inc/config.class.php:549
-msgid "Knowbase Item is mandatory before request is solved/closed"
-msgstr "O item da Base de Conhecimento é obrigatório antes de o pedido ser resolvido/fechado"
-
-#: inc/config.class.php:555
-msgid "Knowbase Item is mandatory before incident is solved/closed"
-msgstr "O item da Base de Conhecimento é obrigatório antes de o incidente ser resolvido/fechado"
-
-#: inc/config.class.php:566
-msgid "Hide satisfaction survey for ticket observer"
-msgstr "Ocultar inquérito de satisfação para o observador do ticket"
-
-#: inc/config.class.php:572
-msgid "Hide satisfaction survey for ticket technician"
-msgstr "Ocultar inquérito de satisfação para o técnico do ticket"
-
-#: inc/commom.class.php:506
-msgid "You do not have permission. Consult your system administrator"
-msgstr "Não tem permissão. Consulte o administrador do sistema"
-
-#: inc/commom.class.php:594
-msgid "Block the solving/closing of a the ticket if the global validation state is waiting for validation"
-msgstr "Bloquear a resolução/fecho de um ticket se o estado de validação global estiver à espera de validação"
-
-#: inc/commom.class.php:359
-msgid "You cannot resolve/close a ticket with validation requests pending response"
-msgstr "Não pode resolver/fechar um ticket com pedidos de validação pendentes de resposta"

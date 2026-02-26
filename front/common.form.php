@@ -31,12 +31,14 @@
  * --------------------------------------------------------------------------
  */
 
-include("../../../inc/includes.php");
+use Glpi\Exception\Http\BadRequestHttpException;
+use GlpiPlugin\Behaviors\Common;
 
-$config = new PluginBehaviorsCommon();
+$config = new Common();
 if (isset($_POST["_clone"])) {
-    PluginBehaviorsCommon::cloneItem($_POST);
+    Common::cloneItem($_POST);
 
     Html::back();
 }
-Html::displayErrorAndDie('Lost!');
+throw new BadRequestHttpException();
+
