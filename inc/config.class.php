@@ -37,13 +37,13 @@ class PluginBehaviorsConfig extends CommonDBTM
     private static $_instance = null;
     static $rightname = 'config';
 
-    static function canCreate()
+    static function canCreate():bool
     {
         return Session::haveRight('config', UPDATE);
     }
 
 
-    static function canView()
+    static function canView():bool
     {
         return Session::haveRight('config', READ);
     }
