@@ -146,7 +146,7 @@ class Ticket
                 self::LAST_GROUP_ASSIGN_WITHOUT_SUPERVISOR,
                 sprintf(
                     __('%1$s (%2$s)'),
-                    __('Last group assigned without supersivor', 'behaviors'),
+                    __('Last group assigned without supervisor', 'behaviors'),
                     __('Behaviours', 'behaviors')
                 )
             );
@@ -421,7 +421,7 @@ class Ticket
             foreach ($DB->request($sql) as $data) {
                 $max = $data['max'];
             }
-            $want = date($config->getField('tickets_id_format'));
+            $want = (int) date($config->getField('tickets_id_format'));
             if ($max < $want) {
                 $DB->doQuery("ALTER TABLE `glpi_tickets` AUTO_INCREMENT=$want");
             }
@@ -432,10 +432,12 @@ class Ticket
                 || $ticket->input['_groups_id_requester'] == 0) {
                 $requesters = self::useRequesterUserGroup($ticket->input);
                 if (isset($ticket->input['_actors']['requester'])) {
-                    $ticket->input['_actors']['requester'] = array_merge(
-                        $ticket->input['_actors']['requester'],
-                        $requesters
-                    );
+                    if (is_array($requesters)) {
+                        $ticket->input['_actors']['requester'] = array_merge(
+                            $ticket->input['_actors']['requester'],
+                            $requesters
+                        );
+                    }
                 } else {
                     if ($requesters !== null) {
                         $ticket->input['_actors']['requester'] = $requesters;
