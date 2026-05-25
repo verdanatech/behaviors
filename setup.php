@@ -49,7 +49,7 @@ use GlpiPlugin\Behaviors\Problem;
 use GlpiPlugin\Behaviors\ProblemTask;
 use Glpi\Plugin\Hooks;
 
-define('PLUGIN_BEHAVIORS_VERSION', '3.0.6');
+define('PLUGIN_BEHAVIORS_VERSION', '3.0.7');
 // Init the hooks of the plugins -Needed
 function plugin_init_behaviors()
 {
@@ -114,8 +114,6 @@ function plugin_init_behaviors()
 
     // End init, when all types are registered
     $PLUGIN_HOOKS[Hooks::POST_INIT]['behaviors'] = [Common::class, 'postInit'];
-
-    $PLUGIN_HOOKS[Hooks::CSRF_COMPLIANT]['behaviors'] = true;
 
     //TO Disable in v11
     //    foreach ($CFG_GLPI["asset_types"] as $type) {
