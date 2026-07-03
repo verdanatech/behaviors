@@ -892,18 +892,21 @@ class PluginBehaviorsTicket
                     Ticket::getClosedStatusArray()
                 )
             )) {
-            $sql = [
-                'SELECT' => [
-                    'MAX' => 'id AS max',
-                    'solutiontypes_id',
-                    'content',
-                ],
-                'FROM' => 'glpi_itilsolutions',
-                'WHERE' => [
-                    'items_id' => $ticket->getID(),
-                    'itemtype' => 'Ticket',
-                ],
-            ];
+                $sql = [
+                    'SELECT' => [
+                        'id',
+                        'solutiontypes_id',
+                        'date_creation',
+                        'content',
+                    ],
+                    'FROM' => 'glpi_itilsolutions',
+                    'WHERE' => [
+                        'items_id' => $ticket->getID(),
+                        'itemtype' => 'Ticket',
+                    ],
+                    'ORDER' => ['id DESC'],
+                    'LIMIT' => 1,
+                ];
 
             foreach ($DB->request($sql) as $data) {
                 if ($config->getField('is_ticketsolutiontype_mandatory')
