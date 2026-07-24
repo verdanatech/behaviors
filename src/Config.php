@@ -1,7 +1,6 @@
 <?php
-/**
- * -------------------------------------------------------------------------
- *
+
+/*
  * LICENSE
  *
  * This file is part of Behaviors plugin for GLPI.
@@ -21,14 +20,13 @@
  *
  * @package   behaviors
  * @author    Infotel, Remi Collet, Nelly Mahu-Lasson
- * @copyright Copyright (c) 2018-2025 Behaviors plugin team
+ * @copyright Copyright (c) 2018-2026 Behaviors plugin team
  * @license   AGPL License 3.0 or (at your option) any later version
  * http://www.gnu.org/licenses/agpl-3.0-standalone.html
  * @link      https://github.com/InfotelGLPI/behaviors/
  * @link      http://www.glpi-project.org/
  * @since     2010
- *
- * --------------------------------------------------------------------------
+ --------------------------------------------------------------------------
  */
 
 namespace GlpiPlugin\Behaviors;
@@ -68,7 +66,7 @@ class Config extends CommonDBTM
 
     function getName($with_comment = 0)
     {
-        return __('Behaviours', 'behaviors');
+        return __('Behaviors', 'behaviors');
     }
 
 
@@ -125,11 +123,15 @@ class Config extends CommonDBTM
              		`is_problemtasktodo` tinyint NOT NULL default '0',
              		`is_changetasktodo` tinyint NOT NULL default '0',
              		`date_mod` timestamp NULL DEFAULT NULL,
+                     `is_knowbaserequest_mandatory` tinyint NOT NULL default '0',
+                     `is_knowbaseincident_mandatory` tinyint NOT NULL default '0',
+                     `is_satisfaction_hide_observer` tinyint NOT NULL default '0',
+                     `is_satisfaction_hide_tech` tinyint NOT NULL default '0',
              		`comment` text,
              		PRIMARY KEY  (`id`)
            	      ) ENGINE=InnoDB  DEFAULT CHARSET = {$default_charset}
              		COLLATE = {$default_collation} ROW_FORMAT=DYNAMIC";
-    		$DB->doQueryOrDie(
+    		$DB->doQuery(
         		$query,
         		__('Error in creating glpi_plugin_behaviors_configs', 'behaviors')
     		);
@@ -254,6 +256,13 @@ class Config extends CommonDBTM
             //version 3.0.0
             $mig->dropField($table, 'myasset');
             $mig->dropField($table, 'groupasset');
+
+            $mig->addField($table, 'is_knowbaserequest_mandatory', 'bool', ['after' => 'is_tickettasktodo']);
+            $mig->addField($table, 'is_knowbaseincident_mandatory', 'bool', ['after' => 'is_tickettasktodo']);
+            $mig->addField($table, 'is_satisfaction_hide_observer', 'bool', ['after' => 'is_knowbaseincident_mandatory']);
+            $mig->addField($table, 'is_satisfaction_hide_tech', 'bool', ['after' => 'is_knowbaserequest_mandatory']);
+  
+
         }
     }
 

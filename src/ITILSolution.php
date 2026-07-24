@@ -1,8 +1,6 @@
 <?php
 
-/**
- * -------------------------------------------------------------------------
- *
+/*
  * LICENSE
  *
  * This file is part of Behaviors plugin for GLPI.
@@ -22,14 +20,13 @@
  *
  * @package   behaviors
  * @author    Infotel, Remi Collet, Nelly Mahu-Lasson
- * @copyright Copyright (c) 2018-2025 Behaviors plugin team
+ * @copyright Copyright (c) 2018-2026 Behaviors plugin team
  * @license   AGPL License 3.0 or (at your option) any later version
  * http://www.gnu.org/licenses/agpl-3.0-standalone.html
  * @link      https://github.com/InfotelGLPI/behaviors/
  * @link      http://www.glpi-project.org/
  * @since     2010
- *
- * --------------------------------------------------------------------------
+ --------------------------------------------------------------------------
  */
 
 namespace GlpiPlugin\Behaviors;
@@ -216,6 +213,30 @@ class ITILSolution
                 );
                 return;
             }
+            $params = [
+                'itemtype'         => 'Ticket',
+                'items_id'         => $ticket->fields['id']
+            ];
+            $existing = $DB->request(
+                'glpi_knowbaseitems_items',
+                $params
+            );
+             if ($config->getField('is_knowbaseincident_mandatory') && $ticket->fields['type'] == 1) {
+                if ($existing->numrows() == 0 && empty($soluce->input['kb_linked_id'])) {
+                      $soluce->input = false;
+                Session::addMessageAfterRedirect(__("Kbowbase Item is mandatory before ticket is solved/closed",
+                                                 'behaviors'), true, ERROR);
+                return;
+                }
+             }
+             if ($config->getField('is_knowbaserequest_mandatory') && $ticket->fields['type'] == 2) {
+                if ($existing->numrows() == 0 && empty($soluce->input['kb_linked_id'])) {
+                      $soluce->input = false;
+                Session::addMessageAfterRedirect(__("Kbowbase Item is mandatory before ticket is solved/closed",
+                                                 'behaviors'), true, ERROR);
+                return;
+                }
+             }
             if ($config->getField('is_tickettasktodo')) {
                 $crit = [
                     'FROM' => 'glpi_tickettasks',

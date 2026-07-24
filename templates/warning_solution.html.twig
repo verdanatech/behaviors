@@ -1,58 +1,56 @@
 {#
-# -------------------------------------------------------------------------
-# Behaviors plugin for GLPI
-# -------------------------------------------------------------------------
-#
-# LICENSE
-#
-# This file is part of Behaviors.
-#
-# Behaviors is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# Behaviors is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with Behaviors. If not, see <http://www.gnu.org/licenses/>.
-# -------------------------------------------------------------------------
-# @copyright Copyright (C) 2018-2025 by Behaviors plugin team.
-# @license   AGPLv3 https://www.gnu.org/licenses/agpl-3.0.html
-# @link      https://github.com/InfotelGLPI/Behaviors
-# -------------------------------------------------------------------------
-#}
-<div class="alert alert-warning">
-    <div class="d-flex align-items-center">
-        <div class="me-3">
-            <i class="ti ti-alert-triangle" style="font-size:2em;color:orange"></i>
-        </div>
-        <div>
-            {% if show_solution_mandatory %}
-                <h4 class="alert-title">{{ __("You must add a description. it's mandatory", 'behaviors') }}</h4>
-            {% endif %}
+* LICENSE
+*
+* This file is part of Behaviors plugin for GLPI.
+*
+* Behaviors is free software: you can redistribute it and/or modify
+* it under the terms of the GNU Affero General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* Behaviors is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* GNU Affero General Public License for more details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with Behaviors. If not, see <http://www.gnu.org/licenses/>.
+*
+* @package   behaviors
+* @author    Infotel, Remi Collet, Nelly Mahu-Lasson
+* @copyright Copyright (c) 2018-2026 Behaviors plugin team
+* @license   AGPL License 3.0 or (at your option) any later version
+* http://www.gnu.org/licenses/agpl-3.0-standalone.html
+* @link      https://github.com/InfotelGLPI/behaviors/
+* @link      http://www.glpi-project.org/
+* @since     2010
+--------------------------------------------------------------------------
+ #}
 
-            {% if show_solutiontype_mandatory %}
-                <h4 class="alert-title">{{ __("You must add a solution type. it's mandatory", 'behaviors') }}</h4>
-            {% endif %}
+<div class="alert alert-danger d-flex align-items-center gap-2 mb-3" role="alert">
+    <i class="ti ti-ban fs-4"></i>
+    <div>
+        {% if show_solution_mandatory %}
+            <strong>{{ __("You must add a description. it's mandatory", 'behaviors') }}</strong>
+        {% endif %}
 
-            {% if warnings|length > 0 %}
-                <h4 class="alert-title">
-                    {% if parent_type == 'Ticket' %}
-                        {{ __('You cannot resolve the ticket', 'behaviors') }} :
-                    {% elseif parent_type == 'Problem' %}
-                        {{ __('You cannot resolve the problem', 'behaviors') }} :
-                    {% elseif parent_type == 'Change' %}
-                        {{ __('You cannot resolve the change', 'behaviors') }} :
-                    {% endif %}
-                </h4>
-                {% for warning in warnings %}
-                    <div class="text-muted">{{ warning }}</div>
-                {% endfor %}
-            {% endif %}
-        </div>
+        {% if show_solutiontype_mandatory %}
+            <strong>{{ __("You must add a solution type. it's mandatory", 'behaviors') }}</strong>
+        {% endif %}
+
+        {% if warnings|length > 0 %}
+            <strong>
+                {% if parent_type == 'Ticket' %}
+                    {{ __('You cannot resolve the ticket', 'behaviors') }} :
+                {% elseif parent_type == 'Problem' %}
+                    {{ __('You cannot resolve the problem', 'behaviors') }} :
+                {% elseif parent_type == 'Change' %}
+                    {{ __('You cannot resolve the change', 'behaviors') }} :
+                {% endif %}
+            </strong>
+            {% for warning in warnings %}
+                <div class="text-muted">{{ warning }}</div>
+            {% endfor %}
+        {% endif %}
     </div>
 </div>
