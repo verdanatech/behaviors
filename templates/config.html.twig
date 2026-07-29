@@ -43,7 +43,7 @@
                 <span>{{ __('New ticket') }}</span>
             </div>
             <div class="row">
-
+                {% if not is_cloud %}
                 {{ fields.dropdownArrayField(
                     'tickets_id_format',
                     config["tickets_id_format"],
@@ -51,6 +51,7 @@
                     __("Ticket's number format", "behaviors"),
                     field_options
                 ) }}
+                {% endif %}
 
                 {{ fields.sliderField(
                     'use_requester_item_group',
@@ -201,21 +202,6 @@
                         field_options
                     ) }}
 
-                         <div class="row">
-                {{ fields.sliderField(
-                    'is_knowbaserequest_mandatory',
-                    config["is_knowbaserequest_mandatory"],
-                    __('Knowbase Item is mandatory before request is solved/closed', 'behaviors'),
-                    field_options
-                ) }}
-                {{ fields.sliderField(
-                    'is_knowbaseincident_mandatory',
-                    config["is_knowbaseincident_mandatory"],
-                    __('Knowbase Item is mandatory before incident is solved/closed', 'behaviors'),
-                    field_options
-                ) }}
-            </div>
-
             </div>
 
             <div class="hr-text">
@@ -236,7 +222,7 @@
                     field_options
                 ) }}
             </div>
-
+            {% if not is_cloud %}
             <div class="hr-text">
                 <i class="fa-2x ti ti-clipboard-check"></i>
                 <span>{{ __('New change' ) }}</span>
@@ -250,7 +236,7 @@
                     field_options
                 ) }}
             </div>
-
+            {% endif %}
             <div class="hr-text">
                 <i class="fa-2x ti ti-package"></i>
                 <span>{{ __('Inventory', 'behaviors') }}</span>

@@ -85,6 +85,50 @@ class Config extends CommonDBTM
     }
 
 
+    /**
+     * Whitelist the config fields accepted from the update form.
+     *
+     * The single config record only holds behavior toggles and two id-format
+     * strings. Filtering the raw $_POST here prevents mass-assignment of any
+     * unexpected key and documents the exact set of writable columns.
+     */
+    function prepareInputForUpdate($input)
+    {
+        $allowed = [
+            'id',
+            'use_requester_item_group',
+            'use_requester_user_group',
+            'is_ticketsolutiontype_mandatory',
+            'is_ticketsolution_mandatory',
+            'is_ticketcategory_mandatory',
+            'is_ticketcategory_mandatory_on_assign',
+            'is_tickettaskcategory_mandatory',
+            'is_tickettech_mandatory',
+            'is_tickettechgroup_mandatory',
+            'is_ticketrealtime_mandatory',
+            'is_ticketlocation_mandatory',
+            'is_ticketdate_locked',
+            'use_assign_user_group',
+            'use_assign_user_group_update',
+            'ticketsolved_updatetech',
+            'tickets_id_format',
+            'changes_id_format',
+            'is_problemsolutiontype_mandatory',
+            'remove_from_ocs',
+            'add_notif',
+            'single_tech_mode',
+            'clone',
+            'addfup_updatetech',
+            'is_tickettasktodo',
+            'is_problemtasktodo',
+            'is_changetasktodo',
+            'comment',
+        ];
+
+        return array_intersect_key($input, array_flip($allowed));
+    }
+
+
     static function install(Migration $mig)
     {
         global $DB;
@@ -123,10 +167,6 @@ class Config extends CommonDBTM
              		`is_problemtasktodo` tinyint NOT NULL default '0',
              		`is_changetasktodo` tinyint NOT NULL default '0',
              		`date_mod` timestamp NULL DEFAULT NULL,
-                     `is_knowbaserequest_mandatory` tinyint NOT NULL default '0',
-                     `is_knowbaseincident_mandatory` tinyint NOT NULL default '0',
-                     `is_satisfaction_hide_observer` tinyint NOT NULL default '0',
-                     `is_satisfaction_hide_tech` tinyint NOT NULL default '0',
              		`comment` text,
              		PRIMARY KEY  (`id`)
            	      ) ENGINE=InnoDB  DEFAULT CHARSET = {$default_charset}
@@ -256,13 +296,6 @@ class Config extends CommonDBTM
             //version 3.0.0
             $mig->dropField($table, 'myasset');
             $mig->dropField($table, 'groupasset');
-
-            $mig->addField($table, 'is_knowbaserequest_mandatory', 'bool', ['after' => 'is_tickettasktodo']);
-            $mig->addField($table, 'is_knowbaseincident_mandatory', 'bool', ['after' => 'is_tickettasktodo']);
-            $mig->addField($table, 'is_satisfaction_hide_observer', 'bool', ['after' => 'is_knowbaseincident_mandatory']);
-            $mig->addField($table, 'is_satisfaction_hide_tech', 'bool', ['after' => 'is_knowbaserequest_mandatory']);
-  
-
         }
     }
 
@@ -295,7 +328,7 @@ class Config extends CommonDBTM
 //        if (!$plugin->isActivated('ocsinventoryng')) {
 //            echo __("Plugin \"OCS Inventory NG\" not installed", "behaviors");
 //        }
-
+        $is_cloud = defined('GLPI_INSTALL_MODE') && GLPI_INSTALL_MODE === 'CLOUD';
         TemplateRenderer::getInstance()->display(
             '@behaviors/config.html.twig',
             [
@@ -304,6 +337,7 @@ class Config extends CommonDBTM
                 'config'            => $config->fields,
                 'action'            => plugin_behaviors_geturl() . 'front/config.form.php',
                 'dateformat'    => $dateformat,
+                'is_cloud' => $is_cloud,
             ],
         );
         return true;

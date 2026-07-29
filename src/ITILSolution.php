@@ -213,30 +213,6 @@ class ITILSolution
                 );
                 return;
             }
-            $params = [
-                'itemtype'         => 'Ticket',
-                'items_id'         => $ticket->fields['id']
-            ];
-            $existing = $DB->request(
-                'glpi_knowbaseitems_items',
-                $params
-            );
-             if ($config->getField('is_knowbaseincident_mandatory') && $ticket->fields['type'] == 1) {
-                if ($existing->numrows() == 0 && empty($soluce->input['kb_linked_id'])) {
-                      $soluce->input = false;
-                Session::addMessageAfterRedirect(__("Kbowbase Item is mandatory before ticket is solved/closed",
-                                                 'behaviors'), true, ERROR);
-                return;
-                }
-             }
-             if ($config->getField('is_knowbaserequest_mandatory') && $ticket->fields['type'] == 2) {
-                if ($existing->numrows() == 0 && empty($soluce->input['kb_linked_id'])) {
-                      $soluce->input = false;
-                Session::addMessageAfterRedirect(__("Kbowbase Item is mandatory before ticket is solved/closed",
-                                                 'behaviors'), true, ERROR);
-                return;
-                }
-             }
             if ($config->getField('is_tickettasktodo')) {
                 $crit = [
                     'FROM' => 'glpi_tickettasks',
