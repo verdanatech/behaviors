@@ -1,6 +1,6 @@
 <?php
 
-/*
+/**
  * LICENSE
  *
  * This file is part of Behaviors plugin for GLPI.
@@ -18,15 +18,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Behaviors. If not, see <http://www.gnu.org/licenses/>.
  *
- * @package   behaviors
  * @author    Infotel, Remi Collet, Nelly Mahu-Lasson
  * @copyright Copyright (c) 2018-2026 Behaviors plugin team
  * @license   AGPL License 3.0 or (at your option) any later version
- * http://www.gnu.org/licenses/agpl-3.0-standalone.html
  * @link      https://github.com/InfotelGLPI/behaviors/
  * @link      http://www.glpi-project.org/
+ * @package   behaviors
  * @since     2010
- --------------------------------------------------------------------------
+ * http://www.gnu.org/licenses/agpl-3.0-standalone.html
+ * --------------------------------------------------------------------------
  */
 
 use GlpiPlugin\Behaviors\Common;
@@ -46,7 +46,7 @@ use GlpiPlugin\Behaviors\Problem;
 use GlpiPlugin\Behaviors\ProblemTask;
 use Glpi\Plugin\Hooks;
 
-define('PLUGIN_BEHAVIORS_VERSION', '3.0.9');
+define('PLUGIN_BEHAVIORS_VERSION', '3.0.10');
 // Init the hooks of the plugins -Needed
 function plugin_init_behaviors()
 {
@@ -109,6 +109,10 @@ function plugin_init_behaviors()
     $PLUGIN_HOOKS[Hooks::PRE_ITEM_FORM]['behaviors'] = [Common::class, 'messageWarning'];
     $PLUGIN_HOOKS[Hooks::POST_ITEM_FORM]['behaviors'] = [Common::class, 'deleteAddSolutionButton'];
 
+    // Externalised (CSP-friendly) replacement for the former inline <script> in
+    // warning_hide_submit.html.twig; hides the "Add solution" submit button.
+    $PLUGIN_HOOKS[Hooks::ADD_JAVASCRIPT]['behaviors'] = 'js/warning_hide_submit.js';
+
     // End init, when all types are registered
     $PLUGIN_HOOKS[Hooks::POST_INIT]['behaviors'] = [Common::class, 'postInit'];
 
@@ -120,7 +124,6 @@ function plugin_init_behaviors()
     //TO Disable in v11
     //    $PLUGIN_HOOKS['add_default_where']['behaviors'] = ['Config', 'add_default_where'];
 }
-
 
 function plugin_version_behaviors()
 {

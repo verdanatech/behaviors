@@ -1,5 +1,3 @@
-<?php
-
 /**
  * LICENSE
  *
@@ -29,7 +27,44 @@
  * --------------------------------------------------------------------------
  */
 
-$loader = require dirname(__DIR__, 3) . '/vendor/autoload.php';
+/* global MutationObserver */
+(function () {
+    'use strict';
 
-$loader->addPsr4('GlpiPlugin\\Behaviors\\', dirname(__DIR__) . '/src/');
-$loader->addPsr4('GlpiPlugin\\Behaviors\\Tests\\', dirname(__DIR__) . '/tests/');
+    var MARKER_ID = 'behaviors-hide-solution-submit';
+
+    function hideSolutionSubmit() {
+        var marker = document.getElementById(MARKER_ID);
+        if (!marker) {
+            return false;
+        }
+        var submits = document.querySelectorAll('.itilsolution :submit');
+        for (var i = 0; i < submits.length; i++) {
+            submits[i].style.display = 'none';
+        }
+        return true;
+    }
+
+    function init() {
+        if (hideSolutionSubmit()) {
+            return;
+        }
+        if (typeof MutationObserver === 'undefined') {
+            return;
+        }
+        // The solution form can be injected after page load; watch for the
+        // marker and stop observing as soon as it is handled.
+        var observer = new MutationObserver(function () {
+            if (hideSolutionSubmit()) {
+                observer.disconnect();
+            }
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();

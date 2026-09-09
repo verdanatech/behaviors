@@ -1,6 +1,6 @@
 <?php
 
-/*
+/**
  * LICENSE
  *
  * This file is part of Behaviors plugin for GLPI.
@@ -18,15 +18,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Behaviors. If not, see <http://www.gnu.org/licenses/>.
  *
- * @package   behaviors
  * @author    Infotel, Remi Collet, Nelly Mahu-Lasson
  * @copyright Copyright (c) 2018-2026 Behaviors plugin team
  * @license   AGPL License 3.0 or (at your option) any later version
- * http://www.gnu.org/licenses/agpl-3.0-standalone.html
  * @link      https://github.com/InfotelGLPI/behaviors/
  * @link      http://www.glpi-project.org/
+ * @package   behaviors
  * @since     2010
- --------------------------------------------------------------------------
+ * http://www.gnu.org/licenses/agpl-3.0-standalone.html
+ * --------------------------------------------------------------------------
  */
 
 namespace GlpiPlugin\Behaviors\Tests\Integration;
@@ -383,10 +383,12 @@ class ITILFollowupTest extends DbTestCase
 
     // ── Aucun technicien assigné ─────────────────────────────────────────────
 
-    public function testDoesNothingWhenNoTechAssigned(): void
+    public function testAssignsAuthorWhenNoTechAssigned(): void
     {
         $this->login();
         $this->enableBehavior('addfup_updatetech');
+
+        $current_user_id = (int) \Session::getLoginUserID();
 
         $ticket = $this->createItem(\Ticket::class, [
             'name'        => 'Ticket no tech assigned',
@@ -399,7 +401,9 @@ class ITILFollowupTest extends DbTestCase
 
         BehaviorsITILFollowup::beforeAdd($fup);
 
+        // Issue #62: replying on an unassigned ticket (no tech AND no group) makes
+        // the follow-up author the technician — this is the feature's main purpose.
         $assigned = $this->getAssignedUserIds($ticket);
-        $this->assertEmpty($assigned, 'No tech assigned — nothing should happen.');
+        $this->assertSame([$current_user_id], $assigned, 'Follow-up author must become the technician on an unassigned ticket (issue #62).');
     }
 }
