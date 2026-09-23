@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-14 12:06+0000\n"
+"POT-Creation-Date: 2026-09-23 12:51+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,271 +18,316 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
-#: src/Document_Item.php:58
+#: src/Document_Item.php:55
 msgid "Add document to ticket"
 msgstr ""
 
-#: templates/config.html.twig:136
+#: templates/config.html.twig:146
 msgid "Adding the ticket solution"
 msgstr ""
 
-#: templates/config.html.twig:277
+#: templates/config.html.twig:287
 msgid "Additional notifications"
 msgstr ""
 
-#: templates/config.html.twig:290
+#: templates/config.html.twig:300
 msgid "Allow Clone"
 msgstr ""
 
-#: src/Document_Item.php:57 src/Document_Item.php:64 src/Common.php:125
-#: src/Config.php:71 src/Ticket.php:73 src/Ticket.php:80 src/Ticket.php:87
-#: src/Ticket.php:110 src/Ticket.php:118 src/Ticket.php:126 src/Ticket.php:134
-#: src/Ticket.php:142 src/Ticket.php:150 setup.php:133
-msgid "Behaviours"
+#: setup.php:131 src/Ticket.php:69 src/Ticket.php:76 src/Ticket.php:83
+#: src/Ticket.php:105 src/Ticket.php:113 src/Ticket.php:121 src/Ticket.php:129
+#: src/Ticket.php:137 src/Ticket.php:145 src/Document_Item.php:54
+#: src/Document_Item.php:61 src/Config.php:65 src/Common.php:119
+msgid "Behaviors"
 msgstr ""
 
-#: templates/config.html.twig:218
+#: templates/config.html.twig:228
 msgid "Block the solving/closing of a problem if task do to"
 msgstr ""
 
-#: templates/config.html.twig:191
+#: templates/config.html.twig:201
 msgid "Block the solving/closing of a the ticket if it remains a task to do"
 msgstr ""
 
-#: src/ITILSolution.php:171 src/Common.php:309 src/Ticket.php:992
-#: templates/config.html.twig:163
+#: src/Ticket.php:1011 src/ITILSolution.php:169 src/Common.php:310
+#: templates/config.html.twig:173
 msgid "Category is mandatory before ticket is solved/closed"
 msgstr ""
 
-#: src/Ticket.php:1075 templates/config.html.twig:88
+#: src/Common.php:445 templates/config.html.twig:139
+msgid "Category is mandatory before ticket is updated"
+msgstr ""
+
+#: src/Ticket.php:1094 templates/config.html.twig:91
 msgid "Category is mandatory when you assign a ticket"
 msgstr ""
 
-#: src/Ticket.php:81
+#: src/Ticket.php:77
 msgid "Change status"
 msgstr ""
 
-#: templates/config.html.twig:232
+#: templates/config.html.twig:242
 msgid "Change's number format"
 msgstr ""
 
-#: src/Common.php:124 templates/clone_form.html.twig:60
+#: src/Common.php:118 templates/clone_form.html.twig:62
 msgid "Clone"
 msgstr ""
 
-#: src/Common.php:159 src/Common.php:250
+#: src/Common.php:152 src/Common.php:252
 msgid "Clone of"
 msgstr ""
 
-#: templates/config.html.twig:297 templates/config.html.twig:303
+#: templates/config.html.twig:307 templates/config.html.twig:313
 msgid "Comment"
 msgid_plural "Comments"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates/config.html.twig:247
+#: templates/config.html.twig:257
 msgid "Delete computer in OCSNG when purged from GLPI"
 msgstr ""
 
-#: src/Document_Item.php:65
+#: src/Document_Item.php:62
 msgid "Delete document to ticket"
 msgstr ""
 
-#: templates/config.html.twig:112
+#: templates/config.html.twig:115
 msgid "Deny change of ticket's creation date"
 msgstr ""
 
-#: src/ITILSolution.php:86 src/ITILSolution.php:366 src/Ticket.php:957
-#: templates/config.html.twig:177
+#: src/Ticket.php:976 src/ITILSolution.php:84 src/ITILSolution.php:365
+#: templates/config.html.twig:187
 msgid "Description of solution is mandatory before ticket is solved/closed"
 msgstr ""
 
-#: templates/clone_form.html.twig:40
+#: templates/clone_form.html.twig:42
 msgid "Destination entity"
 msgstr ""
 
-#: src/ITILSolution.php:99 src/Common.php:304 src/Ticket.php:979
-#: templates/config.html.twig:198
+#: src/Ticket.php:998 src/ITILSolution.php:97 src/Common.php:305
+#: templates/config.html.twig:208
 msgid "Duration is mandatory before ticket is solved/closed"
 msgstr ""
 
-#: src/Config.php:134
+#: src/Config.php:171
 msgid "Error in creating glpi_plugin_behaviors_configs"
 msgstr ""
 
-#: src/ITILSolution.php:198 src/Common.php:326 src/Ticket.php:1019
-#: templates/config.html.twig:156
+#: templates/config.html.twig:63 templates/config.html.twig:95
+msgid "First"
+msgstr ""
+
+#: src/Ticket.php:1038 src/ITILSolution.php:196 src/Common.php:327
+#: templates/config.html.twig:166
 msgid ""
 "Group of technicians assigned is mandatory before ticket is solved/closed"
 msgstr ""
 
-#: templates/config.html.twig:239
+#: templates/config.html.twig:292
+msgid "In the active entity"
+msgstr ""
+
+#: templates/config.html.twig:293
+msgid "In the item's entity"
+msgstr ""
+
+#: templates/config.html.twig:249
 msgid "Inventory"
 msgstr ""
 
-#: src/Ticket.php:117
+#: templates/config.html.twig:63 templates/config.html.twig:95
+msgid "Last"
+msgstr ""
+
+#: src/Ticket.php:112
 msgid "Last group assigned"
 msgstr ""
 
-#: src/Ticket.php:149
+#: src/Ticket.php:144
 msgid "Last group assigned without supervisor"
 msgstr ""
 
-#: src/Ticket.php:125
+#: src/Ticket.php:120
 msgid "Last supplier assigned"
 msgstr ""
 
-#: src/Ticket.php:109
+#: src/Ticket.php:104
 msgid "Last technician assigned"
 msgstr ""
 
-#: src/Ticket.php:133
+#: src/Ticket.php:128
 msgid "Last watcher added"
 msgstr ""
 
-#: src/ITILSolution.php:211 src/Common.php:334 src/Ticket.php:1032
-#: templates/config.html.twig:170
+#: src/Ticket.php:1051 src/ITILSolution.php:209 src/Common.php:335
+#: templates/config.html.twig:180
 msgid "Location is mandatory before ticket is solved/closed"
 msgstr ""
 
-#: templates/clone_form.html.twig:51
+#: templates/clone_form.html.twig:53
 msgid "Name"
 msgstr ""
 
-#: templates/config.html.twig:225
+#: templates/config.html.twig:235
 msgid "New change"
 msgstr ""
 
-#: templates/config.html.twig:41
+#: templates/config.html.twig:43
 msgid "New ticket"
 msgstr ""
 
-#: templates/config.html.twig:267
+#: templates/config.html.twig:63 templates/config.html.twig:95
+#: templates/config.html.twig:119 templates/config.html.twig:291
+msgid "No"
+msgstr ""
+
+#: templates/config.html.twig:277
 msgid "Notification"
 msgid_plural "Notifications"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Ticket.php:74
+#: src/Ticket.php:70
 msgid "Reopen ticket"
 msgstr ""
 
-#: templates/config.html.twig:318
+#: templates/config.html.twig:328
 msgctxt "button"
 msgid "Save"
 msgstr ""
 
-#: templates/config.html.twig:149
+#: templates/config.html.twig:159
 msgid "Set the solution writer as the technician of the ticket"
 msgstr ""
 
-#: templates/config.html.twig:122
+#: templates/config.html.twig:125
 msgid "Single technician and group"
 msgstr ""
 
-#: src/Ticket.php:141
+#: templates/config.html.twig:119
+msgid "Single user and single group"
+msgstr ""
+
+#: templates/config.html.twig:119
+msgid "Single user or group"
+msgstr ""
+
+#: src/Ticket.php:136
 msgid "Supervisor of last group assigned"
 msgstr ""
 
-#: templates/config.html.twig:105
+#: templates/config.html.twig:108
 msgid "Task category is mandatory in a task"
 msgstr ""
 
-#: src/ITILSolution.php:185 src/Common.php:317 src/Ticket.php:1006
-#: templates/config.html.twig:142
+#: src/Ticket.php:1025 src/ITILSolution.php:183 src/Common.php:318
+#: templates/config.html.twig:152
 msgid "Technician assigned is mandatory before ticket is solved/closed"
 msgstr ""
 
-#: templates/config.html.twig:129
+#: templates/config.html.twig:132
 msgid "Technician assignment when adding follow up"
 msgstr ""
 
-#: templates/config.html.twig:130
+#: templates/config.html.twig:133
 msgid "The technician must belong to the group assigned to the ticket"
 msgstr ""
 
-#: src/Ticket.php:88
+#: src/Ticket.php:84
 msgid "Ticket waiting"
 msgstr ""
 
-#: templates/config.html.twig:49
+#: templates/config.html.twig:51
 msgid "Ticket's number format"
 msgstr ""
 
-#: src/ITILSolution.php:254 src/Problem.php:86 templates/config.html.twig:212
+#: src/Problem.php:83 src/ITILSolution.php:252 templates/config.html.twig:222
 msgid "Type of solution is mandatory before problem is solved/closed"
 msgstr ""
 
-#: src/ITILSolution.php:73 src/ITILSolution.php:351 src/Ticket.php:945
-#: templates/config.html.twig:184
+#: src/Ticket.php:964 src/ITILSolution.php:71 src/ITILSolution.php:350
+#: templates/config.html.twig:194
 msgid "Type of solution is mandatory before ticket is solved/closed"
 msgstr ""
 
-#: templates/config.html.twig:206
+#: templates/config.html.twig:216
 msgid "Update of a problem"
 msgstr ""
 
-#: templates/config.html.twig:82
+#: templates/config.html.twig:85
 msgid "Update of a ticket"
 msgstr ""
 
-#: templates/config.html.twig:56
+#: templates/config.html.twig:59
 msgid "Use the associated item's group"
 msgstr ""
 
-#: templates/config.html.twig:66
+#: templates/config.html.twig:69
 msgid "Use the requester's group"
 msgstr ""
 
-#: templates/config.html.twig:74 templates/config.html.twig:98
+#: templates/config.html.twig:77 templates/config.html.twig:101
 msgid "Use the technician's group"
 msgstr ""
 
-#: src/ChangeTask.php:72
+#: src/ChangeTask.php:69
 msgid "You cannot change status of a task in a solved change"
 msgstr ""
 
-#: src/ProblemTask.php:72
+#: src/ProblemTask.php:69
 msgid "You cannot change status of a task in a solved problem"
 msgstr ""
 
-#: src/TicketTask.php:128
+#: src/TicketTask.php:125
 msgid "You cannot change status of a task in a solved ticket"
 msgstr ""
 
-#: templates/warning_solution.html.twig:49
+#: templates/warning_solution.html.twig:48
 msgid "You cannot resolve the change"
 msgstr ""
 
-#: templates/warning_solution.html.twig:47
+#: templates/warning_solution.html.twig:46
 msgid "You cannot resolve the problem"
 msgstr ""
 
-#: templates/warning_solution.html.twig:45
+#: templates/warning_solution.html.twig:44
 msgid "You cannot resolve the ticket"
 msgstr ""
 
-#: src/ITILSolution.php:309 src/Common.php:387 src/Change.php:117
+#: src/ITILSolution.php:308 src/Change.php:121 src/Common.php:388
 msgid "You cannot solve/close a change with task do to"
 msgstr ""
 
-#: src/ITILSolution.php:276 src/Common.php:366
+#: src/ITILSolution.php:274 src/Common.php:367
 msgid "You cannot solve/close a problem with task do to"
 msgstr ""
 
-#: src/ITILSolution.php:233 src/Common.php:348 src/Ticket.php:1055
+#: src/Ticket.php:1074 src/ITILSolution.php:231 src/Common.php:349
 msgid "You cannot solve/close a ticket with task do to"
 msgstr ""
 
-#: templates/warning_solution.html.twig:35
+#: templates/warning_followup.html.twig:40
+msgid "You cannot update the change"
+msgstr ""
+
+#: templates/warning_followup.html.twig:38
+msgid "You cannot update the problem"
+msgstr ""
+
+#: templates/warning_followup.html.twig:36
+msgid "You cannot update the ticket"
+msgstr ""
+
+#: templates/warning_solution.html.twig:34
 msgid "You must add a description. it's mandatory"
 msgstr ""
 
-#: templates/warning_solution.html.twig:39
+#: templates/warning_solution.html.twig:38
 msgid "You must add a solution type. it's mandatory"
 msgstr ""
 
-#: src/TicketTask.php:68 src/TicketTask.php:107
-#: templates/warning_task.html.twig:34
+#: src/TicketTask.php:65 src/TicketTask.php:104
+#: templates/warning_task.html.twig:33
 msgid "You must define a category. it's mandatory"
 msgstr ""

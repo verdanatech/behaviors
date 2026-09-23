@@ -1,8 +1,6 @@
 <?php
 
 /**
- * -------------------------------------------------------------------------
- *
  * LICENSE
  *
  * This file is part of Behaviors plugin for GLPI.
@@ -20,31 +18,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Behaviors. If not, see <http://www.gnu.org/licenses/>.
  *
- * @package   behaviors
  * @author    Infotel, Remi Collet, Nelly Mahu-Lasson
- * @copyright Copyright (c) 2018-2025 Behaviors plugin team
+ * @copyright Copyright (c) 2018-2026 Behaviors plugin team
  * @license   AGPL License 3.0 or (at your option) any later version
- * http://www.gnu.org/licenses/agpl-3.0-standalone.html
  * @link      https://github.com/InfotelGLPI/behaviors/
  * @link      http://www.glpi-project.org/
+ * @package   behaviors
  * @since     2010
- *
+ * http://www.gnu.org/licenses/agpl-3.0-standalone.html
  * --------------------------------------------------------------------------
  */
 
-class PluginBehaviorsComputer extends PluginBehaviorsCommon
-{
-    /**
-     * @param Computer $comp
-     * @return void
-     */
-    public static function beforePurge(Computer $comp)
-    {
-        $config = PluginBehaviorsConfig::getInstance();
+$loader = require dirname(__DIR__, 3) . '/vendor/autoload.php';
 
-        if (($config->getField('remove_from_ocs') > 0)
-            && class_exists('PluginUninstallUninstall')) {
-            PluginUninstallUninstall::deleteComputerInOCSByGlpiID($comp->fields['id']);
-        }
-    }
-}
+$loader->addPsr4('GlpiPlugin\\Behaviors\\', dirname(__DIR__) . '/src/');
+$loader->addPsr4('GlpiPlugin\\Behaviors\\Tests\\', dirname(__DIR__) . '/tests/');

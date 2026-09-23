@@ -1,8 +1,6 @@
 <?php
 
 /**
- * -------------------------------------------------------------------------
- *
  * LICENSE
  *
  * This file is part of Behaviors plugin for GLPI.
@@ -20,15 +18,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Behaviors. If not, see <http://www.gnu.org/licenses/>.
  *
- * @package   behaviors
  * @author    Infotel, Remi Collet, Nelly Mahu-Lasson
- * @copyright Copyright (c) 2018-2025 Behaviors plugin team
+ * @copyright Copyright (c) 2018-2026 Behaviors plugin team
  * @license   AGPL License 3.0 or (at your option) any later version
- * http://www.gnu.org/licenses/agpl-3.0-standalone.html
  * @link      https://github.com/InfotelGLPI/behaviors/
  * @link      http://www.glpi-project.org/
+ * @package   behaviors
  * @since     2010
- *
+ * http://www.gnu.org/licenses/agpl-3.0-standalone.html
  * --------------------------------------------------------------------------
  */
 
@@ -41,7 +38,7 @@ use RuleCriteria;
 class Rule extends Common
 {
     /**
-     * @param Rule $srce
+     * @param \Rule $srce
      * @param array $input
      * @return array
      */
@@ -53,11 +50,11 @@ class Rule extends Common
 
 
     /**
-     * @param Rule $clone
+     * @param \Rule $clone
      * @param $oldid
      * @return void
      */
-    public static function postClone(Rule $clone, $oldid)
+    public static function postClone(\Rule $clone, $oldid)
     {
         global $DB;
 
@@ -67,8 +64,8 @@ class Rule extends Common
         $crit = [
             'FROM' => $criteria->getTable(),
             'WHERE' => [
-                $fkey => $oldid
-            ]
+                $fkey => $oldid,
+            ],
         ];
 
         foreach ($DB->request($crit) as $data) {
@@ -80,8 +77,8 @@ class Rule extends Common
         $crit = [
             'FROM' => $action->getTable(),
             'WHERE' => [
-                $fkey => $oldid
-            ]
+                $fkey => $oldid,
+            ],
         ];
 
         foreach ($DB->request($crit) as $data) {

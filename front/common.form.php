@@ -1,7 +1,6 @@
 <?php
+
 /**
- * -------------------------------------------------------------------------
- *
  * LICENSE
  *
  * This file is part of Behaviors plugin for GLPI.
@@ -19,26 +18,28 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Behaviors. If not, see <http://www.gnu.org/licenses/>.
  *
- * @package   behaviors
  * @author    Infotel, Remi Collet, Nelly Mahu-Lasson
- * @copyright Copyright (c) 2018-2025 Behaviors plugin team
+ * @copyright Copyright (c) 2018-2026 Behaviors plugin team
  * @license   AGPL License 3.0 or (at your option) any later version
- * http://www.gnu.org/licenses/agpl-3.0-standalone.html
  * @link      https://github.com/InfotelGLPI/behaviors/
  * @link      http://www.glpi-project.org/
+ * @package   behaviors
  * @since     2010
- *
+ * http://www.gnu.org/licenses/agpl-3.0-standalone.html
  * --------------------------------------------------------------------------
  */
 
 use Glpi\Exception\Http\BadRequestHttpException;
 use GlpiPlugin\Behaviors\Common;
 
-$config = new Common();
+// Authentication is enforced by the GLPI 11 framework for this (stateful)
+// plugin route. Authorization for the clone action is fully delegated to
+// Common::cloneItem(): it gates on the "clone" config flag, refuses the
+// simplified interface, calls check(READ) and check(UPDATE) on the source and
+// check(CREATE) on the clone (rights + entity), throwing on any failure.
 if (isset($_POST["_clone"])) {
     Common::cloneItem($_POST);
 
     Html::back();
 }
 throw new BadRequestHttpException();
-

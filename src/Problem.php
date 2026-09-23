@@ -1,8 +1,6 @@
 <?php
 
 /**
- * -------------------------------------------------------------------------
- *
  * LICENSE
  *
  * This file is part of Behaviors plugin for GLPI.
@@ -20,15 +18,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Behaviors. If not, see <http://www.gnu.org/licenses/>.
  *
- * @package   behaviors
  * @author    Infotel, Remi Collet, Nelly Mahu-Lasson
- * @copyright Copyright (c) 2018-2025 Behaviors plugin team
+ * @copyright Copyright (c) 2018-2026 Behaviors plugin team
  * @license   AGPL License 3.0 or (at your option) any later version
- * http://www.gnu.org/licenses/agpl-3.0-standalone.html
  * @link      https://github.com/InfotelGLPI/behaviors/
  * @link      http://www.glpi-project.org/
+ * @package   behaviors
  * @since     2010
- *
+ * http://www.gnu.org/licenses/agpl-3.0-standalone.html
  * --------------------------------------------------------------------------
  */
 
@@ -64,8 +61,8 @@ class Problem
                 $problem->input['status'],
                 array_merge(
                     \Problem::getSolvedStatusArray(),
-                    \Problem::getclosedStatusArray()
-                )
+                    \Problem::getclosedStatusArray(),
+                ),
             )) {
 
             $crit = [
@@ -73,7 +70,7 @@ class Problem
                 'WHERE' => [
                     'itemtype' => 'Problem',
                     'items_id' => $problem->input['id'],
-                ]
+                ],
             ];
 
             $soluce = $DB->request($crit);
@@ -84,10 +81,10 @@ class Problem
                 Session::addMessageAfterRedirect(
                     __(
                         "Type of solution is mandatory before problem is solved/closed",
-                        'behaviors'
+                        'behaviors',
                     ),
                     true,
-                    ERROR
+                    ERROR,
                 );
             }
         }
