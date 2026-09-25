@@ -96,6 +96,7 @@ class Config extends CommonDBTM
             'is_ticketsolution_mandatory',
             'is_ticketcategory_mandatory',
             'is_ticketcategory_mandatory_on_assign',
+            'is_ticketcategory_mandatory_on_update',
             'is_tickettaskcategory_mandatory',
             'is_tickettech_mandatory',
             'is_tickettechgroup_mandatory',
@@ -138,6 +139,7 @@ class Config extends CommonDBTM
              		`is_ticketsolutiontype_mandatory` tinyint NOT NULL default '0',
              		`is_ticketsolution_mandatory` tinyint NOT NULL default '0',
              		`is_ticketcategory_mandatory` tinyint NOT NULL default '0',
+             		`is_ticketcategory_mandatory_on_update` tinyint NOT NULL default '0',
              		`is_ticketcategory_mandatory_on_assign` tinyint NOT NULL default '0',
              		`is_tickettaskcategory_mandatory` tinyint NOT NULL default '0',
              		`is_tickettech_mandatory` tinyint NOT NULL default '0',
@@ -289,12 +291,27 @@ class Config extends CommonDBTM
             //version 3.0.0
             $mig->dropField($table, 'myasset');
             $mig->dropField($table, 'groupasset');
+
+            $mig->addField($table, 'is_ticketcategory_mandatory_on_update', 'bool');
         }
     }
 
     public static function uninstall()
     {
         global $DB;
+
+        // Notifications on the plugin's own events would otherwise survive, pointing at
+        // events no hook declares anymore. Purge through the API so that targets and
+        // template links are cleaned too.
+        $notification = new \Notification();
+        $iterator = $DB->request([
+            'SELECT' => ['id'],
+            'FROM'   => \Notification::getTable(),
+            'WHERE'  => ['event' => ['LIKE', 'plugin_behaviors_%']],
+        ]);
+        foreach ($iterator as $data) {
+            $notification->delete(['id' => $data['id']], true);
+        }
 
         $DB->dropTable(self::getTable(), true);
     }

@@ -35,6 +35,7 @@ use CommonGLPI;
 use CommonITILActor;
 use DbUtils;
 use Dropdown;
+use Glpi\Exception\Http\AccessDeniedHttpException;
 use Html;
 use Log;
 use Glpi\Application\View\TemplateRenderer;
@@ -190,8 +191,15 @@ class Common extends CommonGLPI
             return false;
         }
 
+        // Replay the conditions under which the clone tab is offered (getTabNameForItem()):
+        // not from the simplified interface, and UPDATE on the source item.
+        if (($_SESSION['glpiactiveprofile']['interface'] ?? 'helpdesk') == 'helpdesk') {
+            throw new AccessDeniedHttpException();
+        }
+
         // Read original and prepare clone
         $item->check($param['id'], READ);
+        $item->check($param['id'], UPDATE);
 
         $input = $item->fields;
         $input['name'] = $param['name'];
@@ -272,7 +280,7 @@ class Common extends CommonGLPI
 
         // Check is the connected user is a tech
         if (!is_numeric(Session::getLoginUserID(false))
-            || (!(Session::haveRight('ticket', UPDATE) || Session::haveRight('ITILSolution', CREATE))
+            || (!(Session::haveRightsOr('ticket', [UPDATE, \Ticket::OWN]) || Session::haveRight('ITILSolution', CREATE))
                 && !Session::haveRight('problem', UPDATE)
                 && !Session::haveRight('change', UPDATE))) {
             return false; // No check
@@ -426,6 +434,24 @@ class Common extends CommonGLPI
                 if ($config->getField('is_tickettaskcategory_mandatory')) {
                     TemplateRenderer::getInstance()->display('@behaviors/warning_task.html.twig', []);
                 }
+            } elseif ($item->getType() == 'ITILFollowup') {
+                $config = Config::getInstance();
+                if ($config->getField('is_ticketcategory_mandatory_on_update')) {
+                    $warnings = [];
+                    $parentitem = $params['options']['item'];
+                    $cat = ($parentitem->fields['itilcategories_id'] ?? 0);
+
+                    if ($cat == 0) {
+                        $warnings[] = __("Category is mandatory before ticket is updated", 'behaviors');
+                    }
+                    TemplateRenderer::getInstance()->display(
+                        '@behaviors/warning_followup.html.twig',
+                        [
+                            'warnings'                  => $warnings,
+                            'parent_type'               => $parentitem->getType(),
+                        ],
+                    );
+                }
             }
         }
         return $params;
@@ -447,8 +473,26 @@ class Common extends CommonGLPI
                 if (is_array($warnings) && count($warnings) > 0) {
                     TemplateRenderer::getInstance()->display(
                         '@behaviors/warning_hide_submit.html.twig',
-                        [],
+                        [
+                            'id_div' => 'behaviors-hide-solution-submit',
+                        ],
                     );
+                }
+            } elseif ($item->getType() == 'ITILFollowup') {
+                $config = Config::getInstance();
+                if ($config->getField('is_ticketcategory_mandatory_on_update')) {
+                    $warnings = false;
+                    $parentitem = $params['options']['item'];
+                    $cat = ($parentitem->fields['itilcategories_id'] ?? 0);
+
+                    if ($cat == 0) {
+                        TemplateRenderer::getInstance()->display(
+                            '@behaviors/warning_hide_submit.html.twig',
+                            [
+                                'id_div' => 'behaviors-hide-followup-submit',
+                            ],
+                        );
+                    }
                 }
             }
         }

@@ -562,6 +562,34 @@ class Ticket
     }
 
     /**
+     * Entity used to look up the actor groups of a ticket.
+     *
+     * The input comes from a PRE_ITEM_ADD hook, i.e. before prepareInputForAdd(): an
+     * interactive user may only select groups from an entity they can access. Non
+     * interactive contexts (mail collector, cron) keep the value computed by the core.
+     *
+     * @param array $input
+     * @return int
+     */
+    private static function getActorGroupsEntity(array $input): int
+    {
+        if (!isset($input['entities_id'])) {
+            $ticket = new \Ticket();
+            if (isset($input['id']) && $ticket->getFromDB($input['id'])) {
+                return (int) $ticket->fields['entities_id'];
+            }
+            return (int) $_SESSION['glpiactive_entity'];
+        }
+
+        $entities_id = (int) $input['entities_id'];
+        if (is_numeric(Session::getLoginUserID(false))
+            && !Session::haveAccessToEntity($entities_id)) {
+            return (int) $_SESSION['glpiactive_entity'];
+        }
+        return $entities_id;
+    }
+
+    /**
      * @param $input
      * @return array|mixed|void
      */
@@ -574,9 +602,9 @@ class Ticket
                 $actors_requester = $input['_actors']['requester'];
             }
 
-            if (isset($ticket->input['_mailgate']) && $ticket->input['_mailgate'] > 0) {
-                if (isset($ticket->input['_users_id_requester_notif']['alternative_email'][0])) {
-                    $email = $ticket->input['_users_id_requester_notif']['alternative_email'][0];
+            if (isset($input['_mailgate']) && $input['_mailgate'] > 0) {
+                if (isset($input['_users_id_requester_notif']['alternative_email'][0])) {
+                    $email = $input['_users_id_requester_notif']['alternative_email'][0];
                     $condition = [
                         'glpi_users.is_active'  => 1,
                         'glpi_users.is_deleted' => 0, [
@@ -593,9 +621,11 @@ class Ticket
                     ];
                     $user = new \User();
                     if ($user->getFromDBbyEmail($email, $condition)) {
-                        $input['_users_id_requester'] = $user->getID;
+                        $input['_users_id_requester'] = $user->getID();
                     } else {
-                        return $input;
+                        // Unknown sender: leave the requesters untouched. Returning $input here
+                        // would inject the whole ticket input as the requester list.
+                        return null;
                     }
                 }
             }
@@ -650,15 +680,7 @@ class Ticket
                     }
                 }
             }
-            $entities_id = $_SESSION['glpiactive_entity'];
-            if (!isset($input['entities_id'])) {
-                $ticket = new \Ticket();
-                if ($ticket->getFromDB($input['id'])) {
-                    $entities_id = $ticket->fields['entities_id'];
-                }
-            } else {
-                $entities_id = $input['entities_id'];
-            }
+            $entities_id = self::getActorGroupsEntity($input);
 
             if (count($actors_requester) > 0) {
                 $requesters = $actors_requester;
@@ -783,15 +805,7 @@ class Ticket
                 }
             }
 
-            $entities_id = $_SESSION['glpiactive_entity'];
-            if (!isset($input['entities_id'])) {
-                $ticket = new \Ticket();
-                if ($ticket->getFromDB($input['id'])) {
-                    $entities_id = $ticket->fields['entities_id'];
-                }
-            } else {
-                $entities_id = $input['entities_id'];
-            }
+            $entities_id = self::getActorGroupsEntity($input);
 
             if (count($actors_assign) > 0) {
                 $assigns = $actors_assign;
@@ -905,16 +919,21 @@ class Ticket
         $dbu = new DbUtils();
         $config = Config::getInstance();
 
-        // Check is the connected user is a tech
-        if (!is_numeric(Session::getLoginUserID(false))
-            || !Session::haveRight('ticket', UPDATE)) {
+        if (!is_numeric(Session::getLoginUserID(false))) {
             return false; // No check
         }
 
+        // The date lock applies to every authenticated user, not only techs:
+        // a requester must not be able to rewrite the opening date either.
         if (isset($ticket->input['date'])) {
             if ($config->getField('is_ticketdate_locked')) {
                 unset($ticket->input['date']);
             }
+        }
+
+        // Check is the connected user is a tech (UPDATE or OWN ticket right)
+        if (!Session::haveRightsOr('ticket', [UPDATE, \Ticket::OWN])) {
+            return false; // No check
         }
 
         if (isset($ticket->input['status'])
@@ -1091,20 +1110,6 @@ class Ticket
         //            }
         //        }
 
-
-        if ($config->getField('use_assign_user_group_update') && isset($ticket->input['_itil_assign'])) {
-            $ticket->input['_actors']['assign'] = $ticket->getActorsForType(CommonITILActor::ASSIGN);
-            $ticket->input['_actors']['assign'] = array_merge($ticket->input['_actors']['assign'], self::prepairActorsPayload($ticket->input['_itil_assign']));
-            $ticket->input['_actors']['requester'] = $ticket->getActorsForType(CommonITILActor::REQUESTER);
-            $ticket->input['_actors']['observer'] = $ticket->getActorsForType(CommonITILActor::OBSERVER);
-            $assigns = self::useAssignTechGroup($ticket->input, 'use_assign_user_group_update');
-
-            if ($assigns !== null) {
-                $assigns = self::removeDuplicates($assigns);
-            }
-        }
-
-
         if ($config->getField('use_assign_user_group_update')
             && isset($ticket->input['_actors']['assign'])) {
             $assigns = self::useAssignTechGroup($ticket->input, 'use_assign_user_group_update');
@@ -1146,13 +1151,27 @@ class Ticket
     }
 
     /**
+     * Whether the current request targets the core ticket form.
+     *
+     * GLPI 11 serves every request through public/index.php, so PHP_SELF no longer
+     * names the legacy script: rely on the requested path instead.
+     *
+     * @return bool
+     */
+    private static function isTicketFormRequest(): bool
+    {
+        $path = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
+        return is_string($path) && str_ends_with($path, '/front/ticket.form.php');
+    }
+
+    /**
      * @return void
      */
     public static function onNewTicket()
     {
         if (isset($_SESSION['glpiactiveprofile']['interface'])
             && ($_SESSION['glpiactiveprofile']['interface'] == 'central')) {
-            if (strstr($_SERVER['PHP_SELF'], "/front/ticket.form.php")
+            if (self::isTicketFormRequest()
                 && (!isset($_POST['id']) || ($_POST['id'] == 0))) {
                 $config = Config::getInstance();
 
@@ -1293,7 +1312,7 @@ class Ticket
                 } else {
                     unset($_SESSION['glpi_behaviors_auto_group_assign']);
                 }
-            } elseif (strstr($_SERVER['PHP_SELF'], "/front/ticket.form.php")) {
+            } elseif (self::isTicketFormRequest()) {
                 unset($_SESSION['glpi_behaviors_auto_group_request']);
                 unset($_SESSION['glpi_behaviors_auto_group_assign']);
             }
@@ -1464,7 +1483,7 @@ class Ticket
         $dbu = new DbUtils();
 
         // members/managers of the group allowed on object entity
-        // filter group with 'is_assign' (attribute can be unset after notification)
+        // filter group with 'is_notify' (attribute can be unset after notification)
         $criteria = [
             'SELECT' => ['glpi_users.id AS users_id',
                 'glpi_users.language AS language'],
@@ -1485,8 +1504,8 @@ class Ticket
                 ],
                 'glpi_groups' => [
                     'ON' => [
-                        'glpi_groups_users' => 'users_id',
-                        'glpi_users' => 'id',
+                        'glpi_groups_users' => 'groups_id',
+                        'glpi_groups' => 'id',
                     ],
                 ],
             ],
@@ -1511,51 +1530,5 @@ class Ticket
         foreach ($DB->request($criteria) as $data) {
             $target->addToRecipientsList($data);
         }
-    }
-
-    public static function prepairActorsPayload($data)
-    {
-        $actors = array();
-        $fn_add_actor = static function (string $itemtype, int $items_id, array $params) use (&$actors) {
-            $already_added = !empty(array_filter($actors, static function ($actor) use ($itemtype, $items_id, $params) {
-                if ($actor['itemtype'] === $itemtype && (int) $actor['items_id'] === 0) {
-                    // Anonymous actors unique based on email
-                    return ($actor['alternative_email'] ?? null) === ($params['alternative_email'] ?? null);
-                }
-                return $actor['itemtype'] === $itemtype && (int) $actor['items_id'] === $items_id;
-            }));
-            if (!$already_added) {
-                $actors[] = [
-                    'itemtype' => $itemtype,
-                    'items_id' => $items_id,
-                ] + $params;
-            }
-        };
-
-
-        if ($data['users_id'] > 0) {
-            $userobj = new \User();
-
-            if ($userobj->getFromDB($data['users_id'])) {
-
-                $name = formatUserName(
-                    $userobj->fields["id"],
-                    $userobj->fields["name"],
-                    $userobj->fields["realname"],
-                    $userobj->fields["firstname"]
-                );
-                $email = \UserEmail::getDefaultForUser($data['users_id']);
-                $fn_add_actor('User', $data['users_id'], [
-                    'text' => $name,
-                    'title' => $name,
-                    'use_notification' => $email === '' ? false : true,
-                    'default_email' => $email,
-                    'alternative_email' => '',
-                ]);
-            }
-
-
-        }
-        return $actors;
     }
 }

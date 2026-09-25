@@ -46,7 +46,7 @@ use GlpiPlugin\Behaviors\Problem;
 use GlpiPlugin\Behaviors\ProblemTask;
 use Glpi\Plugin\Hooks;
 
-define('PLUGIN_BEHAVIORS_VERSION', '3.0.10');
+define('PLUGIN_BEHAVIORS_VERSION', '3.0.12');
 // Init the hooks of the plugins -Needed
 function plugin_init_behaviors()
 {
@@ -131,7 +131,7 @@ function plugin_version_behaviors()
         'name' => __('Behaviors', 'behaviors'),
         'version' => PLUGIN_BEHAVIORS_VERSION,
         'license' => 'AGPLv3+',
-        'author' => "<a href='https//blogglpi.infotel.com'>Infotel</a>, Xavier CAILLAUD, Remi COLLET, Nelly MAHU-LASSON",
+        'author' => "<a href='https://blogglpi.infotel.com'>Infotel</a>, Xavier CAILLAUD, Remi COLLET, Nelly MAHU-LASSON",
         'homepage' => 'https://github.com/InfotelGLPI/behaviors',
         'minGlpiVersion' => '11.0.0',
         'requirements' => [
